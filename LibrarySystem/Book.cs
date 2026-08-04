@@ -36,6 +36,10 @@ public class Book
 		return author;
 	}
 
+	public bool canBorrow()
+	{
+		return isBorrowed;
+	}
 
 
     public override string ToString()

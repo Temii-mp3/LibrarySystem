@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using System;
+using System.Reflection.Metadata.Ecma335;
 
 public static class AccountManager
 {
@@ -47,7 +48,7 @@ public static class AccountManager
         return -1;
     }
 
-	public static int addBookToAccount(Book b, Account a)
+	public static int addBookToAccount(Book? b, Account a)
 	{
         for (int i = 0; i < accounts.Length; i++)
         {
@@ -70,4 +71,14 @@ public static class AccountManager
 		}
 		return null;
 	}
+
+	public static Book[]  booksInAccount(Account a)
+	{
+        foreach (Account b in accounts)
+        {
+            if (b.getID() == a.getID())
+                return b.getBooks();
+        }
+		return [];
+    }
 }

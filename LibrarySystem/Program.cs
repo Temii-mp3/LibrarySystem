@@ -9,7 +9,7 @@ public class Program
         string email = "";
         string password = "";
         string tempUser = "";
-        Account userAccount;
+        Account userAccount = null;
         Library lib = new Library();
         Random rand = new Random();
         do
@@ -39,7 +39,8 @@ public class Program
                     password = Console.ReadLine();
                     int id = rand.Next(1, 1000);
                     Console.WriteLine("Creating User......");
-                    AccountManager.addAccount(new Account(email, tempUser, password, id));
+                    userAccount = new Account(email, tempUser, password, id);
+                    AccountManager.addAccount(userAccount);
                     Console.WriteLine("Account Created Successfully");
                     user = tempUser;
                     break;
@@ -104,8 +105,30 @@ public class Program
                     case 1:
                         Console.WriteLine("Which Book would you like to Borrow? type ISBN");
                         UtilityClass<Book>.dump(lib.getBooks());
-                        int isbnInput = Convert.ToInt32()
+                        int isbnInput = Convert.ToInt32(Console.ReadLine());
+                        Book? book = lib.getBook(isbnInput);
+                        while(book == null)
+                        {
+                            Console.WriteLine("Invalid ISBN. Try Again");
+                             isbnInput = Convert.ToInt32(Console.ReadLine());
+                            book = lib.getBook(isbnInput);
+                        }
+
+                        if (book.canBorrow())
+                        {
+                            AccountManager.addBookToAccount(lib.getBook(isbnInput), userAccount);
+                            Console.WriteLine($"Book borrowed by user {userAccount.getUserName()}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Book is currently borrowed");
+                        }
+
                         break;
+
+                    case 2:
+                        Console.WriteLine("Which book would you like to return");
+                        UtilityClass<Book>.dump(AccountManager.booksInAccount(userAccount));
                 }
 
             } while (userInput != 4);

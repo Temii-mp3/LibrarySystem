@@ -16,6 +16,7 @@ public class Account
 		password = p;
 		this.id = id;
 		i = 0;
+		books = new Book[100];
 	}
 
 	public string getUserName()
@@ -49,7 +50,7 @@ public class Account
 		return id;
 	}
 
-	public void addBook(Book b)
+	public void addBook(Book? b)
 	{
 		books[i++] = b;
 	}
@@ -71,4 +72,9 @@ public class Account
 		return -1;
 
     }
+
+	public Book[] getBooks()
+	{
+		return books[];
+	}
 }

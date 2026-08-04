@@ -15,7 +15,7 @@ public class Library
         books[3] = new Book(104, "Head First Design Patterns", "Eric Freeman", false);
         books[4] = new Book(105, "Clean Code", "Robert C. Martin", false);
         books[5] = new Book(106, "Building Microservices", "Sam Newman", false);
-        books[6] = new Book(107, "The Clean Coder", "Robert C. Martin", true);
+        books[6] = new Book(107, "The Clean Coder", "Robert C. Martin", false);
         books[7] = new Book(108, "Design Patterns", "Erich Gamma", false);
         books[8] = new Book(109, "The Pragmatic Programmer", "David Thomas", false);
         books[9] = new Book(110, "Structure and Interpretation of Computer Programs", "Harold Abelson", false);
@@ -36,6 +36,17 @@ public class Library
     public Book[] getBooks()
     {
         return books;
+    }
+
+    public Book? getBook(int isbn)
+    {
+        foreach (Book book in books)
+        {
+            if (isbn == book.getISBN())
+                return book;
+        }
+
+        return null;
     }
 
     public Room[] getRooms()
