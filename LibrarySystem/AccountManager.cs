@@ -85,16 +85,17 @@ public static class AccountManager
 
 	public static int returnBook(int isbn, Account a)
 	{
-		Book[] roomArr = a.getBooks();
-        for (int i = 0; i < roomArr.Length; i++)
+		Book[] bookArr = a.getBooks();
+        for (int i = 0; i < bookArr.Length; i++)
         {
-            if (roomArr[i].getISBN() == isbn)
+            if (bookArr[i].getISBN() == isbn)
             {
-				roomArr[i].setBorrow(false);
-                for (int k = i; k < (i - roomArr.Length); k++)
+				bookArr[i].setBorrow(false);
+                for (int k = i; k < (bookArr.Length - i); k++)
                 {
-                    roomArr[i] = roomArr[i + 1];
+                    bookArr[i] = bookArr[i + 1];
                 }
+				a.updateBooks(bookArr);
                 return 0;
             }
         }
@@ -135,10 +136,12 @@ public static class AccountManager
             if (roomArr[i].getId() == roomID)
             {
                 roomArr[i].setBooked(false);
-                for (int k = i; k < (i - roomArr.Length); k++)
+                for (int k = i; k < (roomArr.Length-i); k++)
                 {
                     roomArr[i] = roomArr[i + 1];
                 }
+
+				a.updateRoooms(roomArr);
                 return 0;
             }
         }

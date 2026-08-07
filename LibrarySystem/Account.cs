@@ -83,6 +83,25 @@ public class Account
 
     }
 
+
+		public int removeRoom(Room r)
+	{
+        for (int i = 0; i < rooms.Length; i++)
+        {
+            if (rooms[i] == r)
+            {
+                for (int k = i; k < (i - rooms.Length); k++)
+                {
+                    rooms[i] = rooms[i + 1];
+                }
+                return 0;
+            }
+        }
+
+		return -1;
+
+    }
+
 	public Book[] getBooks()
 	{
 		return books;
@@ -91,5 +110,15 @@ public class Account
 	public Room[] getRooms()
 	{
 		return rooms;
+	}
+
+	public void updateRoooms(Room[] rooms)
+	{
+		this.rooms = rooms;
+	}
+
+	public void updateBooks(Book[] books)
+	{
+		this.books = books;
 	}
 }
