@@ -4,11 +4,11 @@ using System.Reflection.Metadata.Ecma335;
 
 public static class AccountManager
 {
-	static Account[] accounts;
+	static List<Account> accounts;
 	static int i = 0;
 	 static AccountManager()
 	{
-		accounts = new Account[100];
+		accounts = new List<Account>();
 	}
 
 	public static int addAccount(Account a)
@@ -19,73 +19,62 @@ public static class AccountManager
 
 	public static int deleteAccount(Account a)
 	{
-		for(int i = 0; i < accounts.Length; i++)
+		if (accounts.Contains(a))
 		{
-			if (accounts[i] == a)
-			{
-				for ( int k = i; k < (i-accounts.Length); k++)
-				{
-					accounts[i] = accounts[i + 1];
-				}
-				return 0;
-			}
+			accounts.Remove(a);
 		}
-
-
 		return -1;
 	}
 
 	public static int updateAccount(Account a)
 	{
-		for (int i = 0; i < accounts.Length; i++)
-		{
-			if(a.getID() == accounts[i].getID())
-			{
-				accounts[i] = a;
-				return 0;
-			}
+		int indexofAccount = accounts.FindIndex(acc => acc.getID() == a.getID());
+
+		if (accounts.Contains(a)){
+			accounts.Insert(indexofAccount, a);
+			return 0;
 		}
-        return -1;
+
+		return -1;
     }
 
 	public static int addBookToAccount(Book? b, Account a)
 	{
-        for (int i = 0; i < accounts.Length; i++)
-        {
-            if (a.getID() == accounts[i].getID())
-            {
-				accounts[i].addBook(b);
-				b.setBorrow(false);
-				return 0;
-            }
-        }
+
+		if (accounts.Contains(a))
+		{
+			a.addBook(b);
+			return 0;
+		}
         return -1;
 
     }
 
 	public static Account? LookupAccount(string e, string p)
 	{
-		foreach (Account a in accounts)
+		if(accounts.Exists(a => a.getEmail() == e && a.getPassword() == p))
 		{
-			if (a.getEmail() == e && a.getPassword() == p)
-				return a;
+			return accounts.Find(a => a.getEmail() == e && a.getPassword() == p);
 		}
+
 		return null;
 	}
 
-	public static Book[]  booksInAccount(Account a)
+	public static Book[]?  booksInAccount(Account a)
 	{
-        foreach (Account b in accounts)
-        {
-            if (b.getID() == a.getID())
-                return b.getBooks();
-        }
-		return [];
-    }
+		if (accounts.Contains(a))
+		{
+			return a.getBooks();
+		}
+
+		return null;
+	}
 
 	public static int returnBook(int isbn, Account a)
 	{
 		Book[] bookArr = a.getBooks();
+
+		
         for (int i = 0; i < bookArr.Length; i++)
         {
             if (bookArr[i].getISBN() == isbn)
