@@ -4,10 +4,12 @@ public class Room
 {
 	string type;
 	int id;
-	public Room(string t, int i)
+	bool canBook;
+	public Room(string t, int i, bool flag)
 	{
 		type = t;
 		id = i;
+		canBook = flag;
 	}
 
 
@@ -17,5 +19,20 @@ public class Room
     {
 		return "Room ID: " + id + "\nRoom Type: " + type + "\n";
     }
+
+	public int getId()
+	{
+		return id;
+	}
+
+	public bool checkBooked()
+	{
+		return canBook;
+	}
+
+	public void setBooked(bool b)
+	{
+		canBook = b;
+	}
 
 }

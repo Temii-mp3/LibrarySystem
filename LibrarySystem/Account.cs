@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
 public class Account
@@ -8,7 +9,9 @@ public class Account
 	string userName;
 	string password;
 	Book[] books;
+	Room[] rooms;
 	int i;
+	int k;
 	public Account(string e, string u, string p, int id)
 	{
 		email = e;
@@ -16,7 +19,9 @@ public class Account
 		password = p;
 		this.id = id;
 		i = 0;
+		k = 0;
 		books = new Book[100];
+		rooms = new Room[100];
 	}
 
 	public string getUserName()
@@ -55,6 +60,11 @@ public class Account
 		books[i++] = b;
 	}
 
+	public void addRoom(Room? r)
+	{
+		rooms[k++] = r;
+	}
+
 	public int removeBook(Book b)
 	{
         for (int i = 0; i < books.Length; i++)
@@ -75,6 +85,11 @@ public class Account
 
 	public Book[] getBooks()
 	{
-		return books[];
+		return books;
+	}
+
+	public Room[] getRooms()
+	{
+		return rooms;
 	}
 }

@@ -114,7 +114,7 @@ public class Program
                             book = lib.getBook(isbnInput);
                         }
 
-                        if (book.canBorrow())
+                        if (book.checkBorrow())
                         {
                             AccountManager.addBookToAccount(lib.getBook(isbnInput), userAccount);
                             Console.WriteLine($"Book borrowed by user {userAccount.getUserName()}");
@@ -129,6 +129,20 @@ public class Program
                     case 2:
                         Console.WriteLine("Which book would you like to return");
                         UtilityClass<Book>.dump(AccountManager.booksInAccount(userAccount));
+                        int isbn = Convert.ToInt32(Console.ReadLine());
+                        if(AccountManager.returnBook(isbn, userAccount) == -1)
+                        {
+                            Console.WriteLine("An Error Occured");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Book returned successfully!");
+                        }
+                        break;
+
+                    case 3:
+                        UtilityClass<Book>.dump(AccountManager.booksInAccount(userAccount));
+                        break;
                 }
 
             } while (userInput != 4);
@@ -137,7 +151,61 @@ public class Program
 
         void roomServices()
         {
+            do
+            {
+                Console.WriteLine("Welcome to room services, what would you like to do?" +
+                                "\n1. Book room" +
+                                "\n 2. Checkout room" +
+                                "\n 3. Booked rooms" +
+                                "\n 4. Go Back");
 
+                userInput = Convert.ToInt32(Console.ReadLine());
+                switch (userInput)
+                {
+                    case 1:
+                        Console.WriteLine("Which room would you like to Borrow? type ID");
+                        UtilityClass<Room>.dump(lib.getRooms());
+                        int idInput = Convert.ToInt32(Console.ReadLine());
+                        Room? room = lib.getRoom(idInput);
+                        while (room == null)
+                        {
+                            Console.WriteLine("Invalid ISBN. Try Again");
+                            idInput = Convert.ToInt32(Console.ReadLine());
+                            room = lib.getRoom(idInput);
+                        }
+
+                        if (room.checkBooked())
+                        {
+                            AccountManager.addRoomToAccount(lib.getRoom(idInput), userAccount);
+                            Console.WriteLine($"Room booked by user {userAccount.getUserName()}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Room is currently booked");
+                        }
+
+                        break;
+
+                    case 2:
+                        Console.WriteLine("Which room would you like to checkout");
+                        UtilityClass<Room>.dump(AccountManager.roomsInAccount(userAccount));
+                        int id = Convert.ToInt32(Console.ReadLine());
+                        if (AccountManager.checkoutRoom(id, userAccount) == -1)
+                        {
+                            Console.WriteLine("An Error Occured");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Room checked out successfully!");
+                        }
+                        break;
+
+                    case 3:
+                        UtilityClass<Room>.dump(AccountManager.roomsInAccount(userAccount));
+                        break;
+                }
+
+            } while (userInput != 4);
         }
     }
 }

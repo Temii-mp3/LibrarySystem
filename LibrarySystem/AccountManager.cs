@@ -55,6 +55,7 @@ public static class AccountManager
             if (a.getID() == accounts[i].getID())
             {
 				accounts[i].addBook(b);
+				b.setBorrow(false);
 				return 0;
             }
         }
@@ -80,5 +81,69 @@ public static class AccountManager
                 return b.getBooks();
         }
 		return [];
+    }
+
+	public static int returnBook(int isbn, Account a)
+	{
+		Book[] roomArr = a.getBooks();
+        for (int i = 0; i < roomArr.Length; i++)
+        {
+            if (roomArr[i].getISBN() == isbn)
+            {
+				roomArr[i].setBorrow(false);
+                for (int k = i; k < (i - roomArr.Length); k++)
+                {
+                    roomArr[i] = roomArr[i + 1];
+                }
+                return 0;
+            }
+        }
+
+
+        return -1;
+	}
+
+	public static int addRoomToAccount(Room? b, Account a)
+	{
+        for (int i = 0; i < accounts.Length; i++)
+        {
+            if (a.getID() == accounts[i].getID())
+            {
+                accounts[i].addRoom(b);
+                b.setBooked(true);
+                return 0;
+            }
+        }
+        return -1;
+    }
+
+	public static Room[] roomsInAccount(Account a)
+	{
+        foreach (Account b in accounts)
+        {
+            if (b.getID() == a.getID())
+                return b.getRooms();
+        }
+        return [];
+    }
+
+	public static int checkoutRoom(int roomID, Account a)
+	{
+        Room[] roomArr = a.getRooms();
+        for (int i = 0; i < roomArr.Length; i++)
+        {
+            if (roomArr[i].getId() == roomID)
+            {
+                roomArr[i].setBooked(false);
+                for (int k = i; k < (i - roomArr.Length); k++)
+                {
+                    roomArr[i] = roomArr[i + 1];
+                }
+                return 0;
+            }
+        }
+
+
+        return -1;
     }
 }
