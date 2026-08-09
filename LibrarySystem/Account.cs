@@ -8,8 +8,8 @@ public class Account
 	int id;
 	string userName;
 	string password;
-	Book[] books;
-	Room[] rooms;
+	List<Book> books;
+	List<Room> rooms;
 	int i;
 	int k;
 	public Account(string e, string u, string p, int id)
@@ -20,8 +20,8 @@ public class Account
 		this.id = id;
 		i = 0;
 		k = 0;
-		books = new Book[100];
-		rooms = new Room[100];
+		books = new List<Book>();
+		rooms = new List<Room>();
 	}
 
 	public string getUserName()
@@ -57,67 +57,57 @@ public class Account
 
 	public void addBook(Book? b)
 	{
-		books[i++] = b;
+		books.Add(b);
 	}
 
 	public void addRoom(Room? r)
 	{
-		rooms[k++] = r;
-	}
+        rooms.Add(r);
+    }
 
 	public int removeBook(Book b)
 	{
-        for (int i = 0; i < books.Length; i++)
-        {
-            if (books[i] == b)
-            {
-                for (int k = i; k < (i - books.Length); k++)
-                {
-                    books[i] = books[i + 1];
-                }
-                return 0;
-            }
-        }
-
-		return -1;
+		if (books.Remove(b))
+		{
+			return 0;
+		}
+		else
+		{
+			return -1;
+		}
 
     }
 
 
 		public int removeRoom(Room r)
 	{
-        for (int i = 0; i < rooms.Length; i++)
+        if (rooms.Remove(r))
         {
-            if (rooms[i] == r)
-            {
-                for (int k = i; k < (i - rooms.Length); k++)
-                {
-                    rooms[i] = rooms[i + 1];
-                }
-                return 0;
-            }
+            return 0;
         }
-
-		return -1;
+        else
+        {
+            return -1;
+        }
 
     }
 
-	public Book[] getBooks()
+	public List<Book> getBooks()
 	{
 		return books;
 	}
 
-	public Room[] getRooms()
+	public List<Room> getRooms()
 	{
 		return rooms;
 	}
 
-	public void updateRoooms(Room[] rooms)
+	public void updateRoooms(List<Room> rooms)
 	{
 		this.rooms = rooms;
 	}
 
-	public void updateBooks(Book[] books)
+	public void updateBooks(List<Book> books)
 	{
 		this.books = books;
 	}

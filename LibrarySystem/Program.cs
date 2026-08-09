@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 public class Program
 {
@@ -9,6 +11,22 @@ public class Program
         string email = "";
         string password = "";
         string tempUser = "";
+
+/*^ start of string
+
+[\w\.-]+one or more word characters, dots, or hyphens
+
+@ literal at symbol
+
+[\w\.-]+ domain name part
+
+\. literal dot
+
+\w+ top - level domain
+
+$ end of string*/
+
+
         Account userAccount = null;
         Library lib = new Library();
         Random rand = new Random();
@@ -33,10 +51,32 @@ public class Program
                 case 1:
                     Console.WriteLine("Enter Email");
                     email = Console.ReadLine();
+
+                    while (!checkEmail(email))
+                    {
+                        Console.WriteLine("Invalid Email");
+                        email = Console.ReadLine();
+                    }
+
+
                     Console.WriteLine("Enter Username");
                     tempUser = Console.ReadLine();
+
+
+                    while (checkUser(tempUser))
+                    {
+                        Console.WriteLine("Invalid Username");
+                        tempUser = Console.ReadLine();
+                    }
                     Console.WriteLine("Enter Password");
                     password = Console.ReadLine();
+
+                    while (checkPassword(password))
+                    {
+                        Console.WriteLine("Invalid Password");
+                        password = Console.ReadLine();
+                    }
+
                     int id = rand.Next(1, 1000);
                     Console.WriteLine("Creating User......");
                     userAccount = new Account(email, tempUser, password, id);
@@ -48,8 +88,20 @@ public class Program
                     Console.WriteLine("Enter Email");
                     email = Console.ReadLine();
 
+                    while (checkEmail(email))
+                    {
+                        Console.WriteLine("Invalid Email");
+                        email = Console.ReadLine();
+                    }
+
                     Console.WriteLine("Enter Password");
                     password = Console.ReadLine();
+
+                    while (checkPassword(password))
+                    {
+                        Console.WriteLine("Invalid Password");
+                        password = Console.ReadLine();
+                    }
 
                     Console.WriteLine("Logging in....");
 
@@ -152,7 +204,7 @@ public class Program
         void roomServices()
         {
             do
-            {
+            {  
                 Console.WriteLine("Welcome to room services, what would you like to do?" +
                                 "\n1. Book room" +
                                 "\n 2. Checkout room" +
@@ -207,5 +259,30 @@ public class Program
 
             } while (userInput != 4);
         }
+    }
+
+    static bool checkEmail(string email)
+    {
+        return Regex.IsMatch(email, @"^[\w\.-]+@[\w\.-]+\.\w+$");
+    }
+
+    static bool checkPassword(string password)
+    {
+        if (Regex.IsMatch(password, @"^\w{8,}+$"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    static bool checkUser(String user)
+    {
+        if (Regex.IsMatch(user, @"^\w({3,})+$"))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

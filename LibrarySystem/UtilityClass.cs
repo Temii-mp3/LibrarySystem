@@ -2,7 +2,7 @@
 
 public static class UtilityClass<T>
 {
-    public static void dump(T[] arr)
+    public static void dump(List<T> arr)
     {
         foreach (T value in arr)
         {
