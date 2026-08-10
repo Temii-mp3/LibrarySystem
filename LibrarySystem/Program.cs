@@ -109,7 +109,7 @@ public class Program
 
                             Account tempAcc = AccountManager.LookupAccount(email, password);
                             userAccount = tempAcc;
-                            user = userAccount.getUserName();
+                            user = userAccount.Username;
                         }
                         catch (AccountNotFoundException e)
                         {
@@ -163,8 +163,8 @@ public class Program
                             do
                             {
                                 Console.WriteLine("Which Book would you like to Borrow? type ISBN");
-                                UtilityClass<Book>.dump(lib.getBooks());
-                                 isbnInput = Convert.ToInt32(Console.ReadLine());
+                                UtilityClass<Book>.dump(lib.Books);
+                                isbnInput = Convert.ToInt32(Console.ReadLine());
                                 book = lib.getBook(isbnInput);
                             } while (book is null);
                         }
@@ -174,10 +174,10 @@ public class Program
                             break;
                         }
 
-                        if (book.checkBorrow())
+                        if (book.CanBorrow)
                         {
                             AccountManager.addBookToAccount(lib.getBook(isbnInput), userAccount);
-                            Console.WriteLine($"Book borrowed by user {userAccount.getUserName()}");
+                            Console.WriteLine($"Book borrowed by user {userAccount.Username}");
                         }
                         else
                         {
@@ -187,17 +187,20 @@ public class Program
                         break;
 
                     case 2:
-                        Console.WriteLine("Which book would you like to return");
-                        UtilityClass<Book>.dump(AccountManager.booksInAccount(userAccount));
-                        int isbn = Convert.ToInt32(Console.ReadLine());
-                        if (AccountManager.returnBook(isbn, userAccount) == -1)
-                        {
-                            Console.WriteLine("An Error Occured");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Book returned successfully!");
-                        }
+                        int isbn;
+                        Book tempBook;
+                                try
+                                {
+                                    Console.WriteLine("Which book would you like to return");
+                                    UtilityClass<Book>.dump(AccountManager.booksInAccount(userAccount));
+                                    isbn = Convert.ToInt32(Console.ReadLine());
+                                    tempBook = AccountManager.returnBook(isbn, userAccount);
+                                }catch(BookNotFoundException e)
+                                {
+                                    Console.WriteLine("Book not found");
+                                    break;
+                                }
+                        Console.WriteLine("Book returned successfully");
                         break;
 
                     case 3:
@@ -224,7 +227,7 @@ public class Program
                 {
                     case 1:
                         Console.WriteLine("Which room would you like to Borrow? type ID");
-                        UtilityClass<Room>.dump(lib.getRooms());
+                        UtilityClass<Room>.dump(lib.Rooms);
                         int idInput = Convert.ToInt32(Console.ReadLine());
                         Room? room = lib.getRoom(idInput);
                         while (room == null)
@@ -234,10 +237,10 @@ public class Program
                             room = lib.getRoom(idInput);
                         }
 
-                        if (room.checkBooked())
+                        if (room.CanBook)
                         {
                             AccountManager.addRoomToAccount(lib.getRoom(idInput), userAccount);
-                            Console.WriteLine($"Room booked by user {userAccount.getUserName()}");
+                            Console.WriteLine($"Room booked by user {userAccount.Username}");
                         }
                         else
                         {

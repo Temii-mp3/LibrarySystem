@@ -6,10 +6,6 @@ public static class UtilityClass<T>
     {
         foreach (T value in arr)
         {
-            if(value == null)
-            {
-                continue;
-            }
             Console.Write(value.ToString() + " ");
         }
     }

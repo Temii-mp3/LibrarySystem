@@ -4,70 +4,38 @@ using System.Runtime.CompilerServices;
 
 public class Account
 {
-	string email;
-	int id;
-	string userName;
-	string password;
-	List<Book> books;
-	List<Room> rooms;
+	public String Email{get; set;}
+	public int Id {get; set;}
+	public string Username{get; set;}
+	public int Limit {get; set;} = 5;
+	public string Password{get; set;}
+	public List<Book> Books{get; set;} = new List<Book>();
+	public List<Room> Rooms{get; set;} = new List<Room>();
 	int i;
 	int k;
 	public Account(string e, string u, string p, int id)
 	{
-		email = e;
-		userName = u;
-		password = p;
-		this.id = id;
+		this.Email = e;
+		this.Username = u;
+		this.Password = p;
+		this.Id = id;
 		i = 0;
 		k = 0;
-		books = new List<Book>();
-		rooms = new List<Room>();
-	}
-
-	public string getUserName()
-	{
-		return userName;
-	}
-	public string getEmail()
-	{
-		return email;
-	}
-	public string getPassword()
-	{
-		return password;
-	}
-
-    public void setPassword(string p)
-    {
-		password = p;
-    }
-    public void setEmail(string e)
-    {
-		email = e;
-    }
-    public void setUserName(string u)
-    {
-		userName = u;
-    }
-
-	public int getID()
-	{
-		return id;
 	}
 
 	public void addBook(Book? b)
 	{
-		books.Add(b);
+		Books.Add(b);
 	}
 
 	public void addRoom(Room? r)
 	{
-        rooms.Add(r);
+        Rooms.Add(r);
     }
 
 	public int removeBook(Book b)
 	{
-		if (books.Remove(b))
+		if (Books.Remove(b))
 		{
 			return 0;
 		}
@@ -81,7 +49,7 @@ public class Account
 
 		public int removeRoom(Room r)
 	{
-        if (rooms.Remove(r))
+        if (Rooms.Remove(r))
         {
             return 0;
         }
@@ -91,24 +59,4 @@ public class Account
         }
 
     }
-
-	public List<Book> getBooks()
-	{
-		return books;
-	}
-
-	public List<Room> getRooms()
-	{
-		return rooms;
-	}
-
-	public void updateRoooms(List<Room> rooms)
-	{
-		this.rooms = rooms;
-	}
-
-	public void updateBooks(List<Book> books)
-	{
-		this.books = books;
-	}
 }
