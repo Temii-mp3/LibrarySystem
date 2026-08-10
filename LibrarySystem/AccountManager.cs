@@ -50,14 +50,14 @@ public static class AccountManager
 
     }
 
-	public static Account? LookupAccount(string e, string p)
+	public static Account? LookupAccount (string e, string p)
 	{
 		if(accounts.Exists(a => a.getEmail() == e && a.getPassword() == p))
 		{
 			return accounts.Find(a => a.getEmail() == e && a.getPassword() == p);
 		}
 
-		return null;
+		throw new AccountNotFoundException("Account not found");
 	}
 
 	public static List<Book>?  booksInAccount(Account a)
