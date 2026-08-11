@@ -2,14 +2,14 @@
 
 public class Room
 {
-	string type;
-	int id;
-	bool canBook;
+	public string Type{get; set;}
+	public int Id{get; set;}
+	public bool CanBook{get; set;}
 	public Room(string t, int i, bool flag)
 	{
-		type = t;
-		id = i;
-		canBook = flag;
+		Type = t;
+		Id = i;
+		CanBook = flag;
 	}
 
 
@@ -17,22 +17,8 @@ public class Room
 
     public override string ToString()
     {
-		return "Room ID: " + id + "\nRoom Type: " + type + "\n";
+		return "Room ID: " + Id + "\nRoom Type: " + Type + "\n";
     }
 
-	public int getId()
-	{
-		return id;
-	}
-
-	public bool checkBooked()
-	{
-		return canBook;
-	}
-
-	public void setBooked(bool b)
-	{
-		canBook = b;
-	}
 
 }

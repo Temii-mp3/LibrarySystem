@@ -13,19 +13,19 @@ public class Program
         string? tempUser = "";
         char input=' ';
 
-/*^ start of string
+        /*^ start of string
 
-[\w\.-]+one or more word characters, dots, or hyphens
+        [\w\.-]+one or more word characters, dots, or hyphens
 
-@ literal at symbol
+        @ literal at symbol
 
-[\w\.-]+ domain name part
+        [\w\.-]+ domain name part
 
-\. literal dot
+        \. literal dot
 
-\w+ top - level domain
+        \w+ top - level domain
 
-$ end of string*/
+        $ end of string*/
 
 
         Account? userAccount = null;
@@ -33,14 +33,7 @@ $ end of string*/
         Random rand = new Random();
         do
         {
-            Console.WriteLine("Hello, Welcome to the Library! what would you like to do: \n" +
-                            "1. Create an account\n" +
-                            "2. Log in to an account\n" +
-                            "3. Book Services\n" +
-                            "4. Room Services\n" +
-                            "5. Log out\n" +
-                            "6. Quit");
-            Console.WriteLine($"Currently Logged in as: {(string.IsNullOrEmpty(user) ? "Guest" : user)}");
+            mainMenu();
             userInput = Convert.ToInt32(Console.ReadLine());
             while (userInput > 6 || userInput < 1)
             {
@@ -86,37 +79,45 @@ $ end of string*/
                     user = tempUser;
                     break;
                 case 2:
-                    Console.WriteLine("Enter Email");
-                    email = Console.ReadLine();
-
-                    while (checkEmail(email))
+                    do
                     {
-                        Console.WriteLine("Invalid Email");
-                        email = Console.ReadLine();
-                    }
+                        try
+                        {
+                            Console.WriteLine("Log in Console press 0 to quit");
+                            Console.WriteLine("Enter Email");
+                            email = Console.ReadLine();
 
-                    Console.WriteLine("Enter Password");
-                    password = Console.ReadLine();
+                            if (email is "0")
+                            {
+                                break;
+                            }
+                            while (!checkEmail(email))
+                            {
+                                Console.WriteLine("Invalid Email");
+                                email = Console.ReadLine();
+                            }
 
-                    while (checkPassword(password))
-                    {
-                        Console.WriteLine("Invalid Password");
-                        password = Console.ReadLine();
-                    }
+                            Console.WriteLine("Enter Password");
+                            password = Console.ReadLine();
 
-                    Console.WriteLine("Logging in....");
+                            while (!checkPassword(password))
+                            {
+                                Console.WriteLine("Invalid Password");
+                                password = Console.ReadLine();
+                            }
 
-                    Account? tempAcc = AccountManager.LookupAccount(email, password);
+                            Console.WriteLine("Logging in....");
 
-                    if (tempAcc == null)
-                    {
-                        Console.WriteLine("Account not found");
-                    }
-                    else
-                    {
-                        userAccount = tempAcc;
-                        user = userAccount.getUserName();
-                    }
+                            Account tempAcc = AccountManager.LookupAccount(email, password);
+                            userAccount = tempAcc;
+                            user = userAccount.Username;
+                        }
+                        catch (AccountNotFoundException e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                    } while (userAccount is null);
+
                     break;
                 case 3:
                     bookServices();
@@ -161,21 +162,28 @@ $ end of string*/
                 switch (userInput)
                 {
                     case 1:
-                        Console.WriteLine("Which Book would you like to Borrow? type ISBN");
-                        UtilityClass<Book>.dump(lib.getBooks());
-                        int isbnInput = Convert.ToInt32(Console.ReadLine());
-                        Book? book = lib.getBook(isbnInput);
-                        while(book == null)
+                        Book? book;
+                        int isbnInput;
+                        try
                         {
-                            Console.WriteLine("Invalid ISBN. Try Again");
-                             isbnInput = Convert.ToInt32(Console.ReadLine());
-                            book = lib.getBook(isbnInput);
+                            do
+                            {
+                                Console.WriteLine("Which Book would you like to Borrow? type ISBN");
+                                UtilityClass<Book>.dump(lib.Books);
+                                isbnInput = Convert.ToInt32(Console.ReadLine());
+                                book = lib.getBook(isbnInput);
+                            } while (book is null);
+                        }
+                        catch (BookNotFoundException e)
+                        {
+                            Console.WriteLine(e.Message);
+                            break;
                         }
 
-                        if (book.checkBorrow() && userAccount is not null)
+                        if (book.CanBorrow)
                         {
                             AccountManager.addBookToAccount(lib.getBook(isbnInput), userAccount);
-                            Console.WriteLine($"Book borrowed by user {userAccount.getUserName()}");
+                            Console.WriteLine($"Book borrowed by user {userAccount.Username}");
                         }
                         else
                         {
@@ -185,17 +193,20 @@ $ end of string*/
                         break;
 
                     case 2:
-                        Console.WriteLine("Which book would you like to return");
-                        UtilityClass<Book>.dump(AccountManager.booksInAccount(userAccount));
-                        int isbn = Convert.ToInt32(Console.ReadLine());
-                        if(AccountManager.returnBook(isbn, userAccount) == -1)
-                        {
-                            Console.WriteLine("An Error Occured");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Book returned successfully!");
-                        }
+                        int isbn;
+                        Book tempBook;
+                                try
+                                {
+                                    Console.WriteLine("Which book would you like to return");
+                                    UtilityClass<Book>.dump(AccountManager.booksInAccount(userAccount));
+                                    isbn = Convert.ToInt32(Console.ReadLine());
+                                    tempBook = AccountManager.returnBook(isbn, userAccount);
+                                }catch(BookNotFoundException e)
+                                {
+                                    Console.WriteLine("Book not found");
+                                    break;
+                                }
+                        Console.WriteLine("Book returned successfully");
                         break;
 
                     case 3:
@@ -210,7 +221,7 @@ $ end of string*/
         void roomServices()
         {
             do
-            {  
+            {
                 Console.WriteLine("Welcome to room services, what would you like to do?" +
                                 "\n1. Book room" +
                                 "\n 2. Checkout room" +
@@ -222,7 +233,7 @@ $ end of string*/
                 {
                     case 1:
                         Console.WriteLine("Which room would you like to Borrow? type ID");
-                        UtilityClass<Room>.dump(lib.getRooms());
+                        UtilityClass<Room>.dump(lib.Rooms);
                         int idInput = Convert.ToInt32(Console.ReadLine());
                         Room? room = lib.getRoom(idInput);
                         while (room == null)
@@ -232,10 +243,10 @@ $ end of string*/
                             room = lib.getRoom(idInput);
                         }
 
-                        if (room.checkBooked() && userAccount is not null)
+                        if (room.CanBook)
                         {
                             AccountManager.addRoomToAccount(lib.getRoom(idInput), userAccount);
-                            Console.WriteLine($"Room booked by user {userAccount.getUserName()}");
+                            Console.WriteLine($"Room booked by user {userAccount.Username}");
                         }
                         else
                         {
@@ -265,6 +276,18 @@ $ end of string*/
 
             } while (userInput != 4);
         }
+
+        void mainMenu()
+        {
+            Console.WriteLine("Hello, Welcome to the Library! what would you like to do: \n" +
+                                "1. Create an account\n" +
+                                "2. Log in to an account\n" +
+                                "3. Book Services\n" +
+                                "4. Room Services\n" +
+                                "5. Log out\n" +
+                                "6. Quit");
+            Console.WriteLine($"Currently Logged in as: {(string.IsNullOrEmpty(user) ? "Guest" : user)}");
+        }
     }
 
     static bool checkEmail(string? email)
@@ -274,32 +297,24 @@ $ end of string*/
             return Regex.IsMatch(email, @"^[\w\.-]+@[\w\.-]+\.\w+$");
         }
 
-        return false;
-    }
-
-    static bool checkPassword(string? password)
+    static bool checkPassword(string password)
     {
-        if(password is not null)
+        if (Regex.IsMatch(password, @"^\w{8,}$"))
         {
-            if (Regex.IsMatch(password, @"^\w{8,}$"))
-            {
-                return true;
-            }
+            return true;
         }
 
 
         return false;
     }
 
-    static bool checkUser(String? user)
+    static bool checkUser(String user)
     {
-        if(user is not null)
+        if (Regex.IsMatch(user, @"^\w{3,}$"))
         {
-            if (Regex.IsMatch(user, @"^\w{3,}$"))
-            {
-                return true;
-            }
+            return true;
         }
+
         return false;
     }
 }

@@ -4,9 +4,10 @@ using System.Reflection.Metadata.Ecma335;
 
 public static class AccountManager
 {
-	static List<Account> accounts { get; set; }
+	const int LIMIT = 5;
+	static List<Account> accounts;
 	static int i = 0;
-	 static AccountManager()
+	static AccountManager()
 	{
 		accounts = new List<Account>();
 	}
@@ -28,114 +29,102 @@ public static class AccountManager
 
 	public static int updateAccount(Account a)
 	{
-		int indexofAccount = accounts.FindIndex(acc => acc.getID() == a.getID());
+		int indexofAccount = accounts.FindIndex(acc => acc.Id == a.Id);
 
-		if (accounts.Contains(a)){
+		if (accounts.Contains(a))
+		{
 			accounts.Insert(indexofAccount, a);
 			return 0;
 		}
 
 		return -1;
-    }
+	}
 
-	public static int addBookToAccount(Book? b, Account? a)
+	public static Book addBookToAccount(Book? b, Account a)
 	{
-	
-		if (a is not null && accounts.Contains(a))
+		if (!accounts.Contains(a))
 		{
-			a.addBook(b);
-			return 0;
+			throw new AccountNotFoundException("Account not found");
 		}
-        return -1;
 
-    }
+		if (a.Books.Count > 5)
+		{
+			throw new BookLimitReachedException($"Book Limit of {LIMIT} has been reached");
+		}
+
+		a.addBook(b);
+		return b;
+
+
+	}
 
 	public static Account? LookupAccount(string? e, string? p)
 	{
-		if(e is not null && p is not null)
+		if (accounts.Exists(a => a.Email == e && a.Password == p))
 		{
-            if (accounts.Exists(a => a.getEmail() == e && a.getPassword() == p))
-            {
-                return accounts.Find(a => a.getEmail() == e && a.getPassword() == p);
-            }
+			return accounts.Find(a => a.Email == e && a.Password == p);
+		}
 
-        }
-
-        return null;
+		throw new AccountNotFoundException("Account not found");
 	}
 
-	public static List<Book>?  booksInAccount(Account? a)
+	public static List<Book>? booksInAccount(Account a)
 	{
 		if (a is not null && accounts.Contains(a))
 		{
-			return a.getBooks();
+			return a.Books;
 		}
 
 		return null;
 	}
 
-	public static int returnBook(int isbn, Account? a)
+	public static Book returnBook(int isbn, Account a)
 	{
-		if(a is not null)
+		List<Book> bookArr = a.Books;
+
+
+		Book book = bookArr.Find(r => r.ISBN == isbn);
+
+		if (book != null)
 		{
-            List<Book>? bookArr = a.getBooks();
-            if (bookArr is not null)
-            {
-                Book? book = bookArr.Find(r => r.getISBN() == isbn);
-
-                if (book is not null)
-                {
-                    bookArr.Remove(book);
-                    return 0;
-                }
-            }
-        }
-
-
-        return -1;
+			bookArr.Remove(book);
+			return book;
+		}
+		throw new BookNotFoundException("Book not found");
 	}
 
 	public static int addRoomToAccount(Room? b, Account? a)
 	{
-        if (a is not null && accounts.Contains(a))
-        {
-            a.addRoom(b);
-            return 0;
-        }
-        return -1;
-    }
+		if (accounts.Contains(a))
+		{
+			a.addRoom(b);
+			return 0;
+		}
+		return -1;
+	}
 
 	public static List<Room>? roomsInAccount(Account? a)
 	{
-		if(a is not null && accounts.Exists(u => u.getID() == a.getID()))
+		if (accounts.Exists(u => u.Id == a.Id))
 		{
-			return a.getRooms();
+			return a.Rooms;
 		}
 
 		return null;
 
-    }
+	}
 
-	public static int checkoutRoom(int roomID, Account? a)
+	public static int checkoutRoom(int bookID, Account a)
 	{
+		List<Room> bookArr = a.Rooms;
 
-		if(a is not null)
-        {
-            List<Room>? roomArr = a.getRooms();
+		Room book = bookArr.Find(r => r.Id == bookID);
 
-            if (roomArr is not null)
-            {
-                Room? room = roomArr.Find(r => r.getId() == roomID);
-
-                if (room is not null)
-                {
-                    roomArr.Remove(room);
-                    return 0;
-                }
-            }
-
-        }
-
-        return -1;
-    }
+		if (book != null)
+		{
+			bookArr.Remove(book);
+			return 0;
+		}
+		return -1;
+	}
 }
