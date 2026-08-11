@@ -18,17 +18,17 @@ public class Library
         Books.Add(new Book(109, "The Pragmatic Programmer", "David Thomas", true));
         Books.Add(new Book(110, "Structure and Interpretation of Computer Programs", "Harold Abelson", true));
 
-        // 10 dummy rooms
-        rooms.Add(new Room("Study Room", 201, true));
-        rooms.Add(new Room("Conference Room", 202, true));
-        rooms.Add(new Room("Reading Hall", 203, true));
-        rooms.Add(new Room("Computer Lab", 204, true));
-        rooms.Add(new Room("Study Room", 205, true));
-        rooms.Add(new Room("Meeting Room", 206, true));
-        rooms.Add(new Room("Quiet Zone", 207, true));
-        rooms.Add(new Room("Group Study Room", 208, true));
-        rooms.Add(new Room("Archive Room", 209, true));
-        rooms.Add(new Room("Multimedia Room", 210, true));
+        // 10 dummy Rooms
+        Rooms.Add(new Room("Study Room", 201, true));
+        Rooms.Add(new Room("Conference Room", 202, true));
+        Rooms.Add(new Room("Reading Hall", 203, true));
+        Rooms.Add(new Room("Computer Lab", 204, true));
+        Rooms.Add(new Room("Study Room", 205, true));
+        Rooms.Add(new Room("Meeting Room", 206, true));
+        Rooms.Add(new Room("Quiet Zone", 207, true));
+        Rooms.Add(new Room("Group Study Room", 208, true));
+        Rooms.Add(new Room("Archive Room", 209, true));
+        Rooms.Add(new Room("Multimedia Room", 210, true));
     }
 
 
@@ -45,7 +45,7 @@ public class Library
 
     public Room? getRoom(int id)
     {
-        Room room = rooms.Find(b => b.Id == id);
+        Room room = Rooms.Find(b => b.Id == id);
         if (room == null)
         {
             return null;

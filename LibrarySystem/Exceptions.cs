@@ -53,3 +53,8 @@ public class BookBorrowedException: Exception
     public BookBorrowedException(string message) : base(message) { }
 }
 
+public class AccountExistsException: Exception
+{
+    public AccountExistsException(){}
+    public BookBorrowedException(string message) : base(message){}
+}

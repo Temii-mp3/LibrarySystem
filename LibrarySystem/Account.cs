@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
+﻿
 
 public class Account
 {
@@ -15,10 +13,10 @@ public class Account
 	int k;
 	public Account(string e, string u, string p, int id)
 	{
-		this.Email = e;
-		this.Username = u;
-		this.Password = p;
-		this.Id = id;
+		Email = e;
+		Username = u;
+		Password = p;
+		Id = id;
 		i = 0;
 		k = 0;
 	}
@@ -28,14 +26,13 @@ public class Account
 		Books.Add(b);
 	}
 
-	}
 
 	public void addRoom(Room? r)
 	{
         Rooms.Add(r);
     }
 
-    }
+    
 
 	public int removeBook(Book? b)
 	{
@@ -47,6 +44,7 @@ public class Account
 		{
 			return -1;
 		}
+	}
 
 
 
