@@ -7,10 +7,11 @@ public class Program
     static void Main(String[] args)
     {
         int userInput;
-        string user = "";
-        string email = "";
-        string password = "";
-        string tempUser = "";
+        string? user = "";
+        string? email = "";
+        string? password = "";
+        string? tempUser = "";
+        char input=' ';
 
 /*^ start of string
 
@@ -27,7 +28,7 @@ public class Program
 $ end of string*/
 
 
-        Account userAccount = null;
+        Account? userAccount = null;
         Library lib = new Library();
         Random rand = new Random();
         do
@@ -105,7 +106,7 @@ $ end of string*/
 
                     Console.WriteLine("Logging in....");
 
-                    Account tempAcc = AccountManager.LookupAccount(email, password);
+                    Account? tempAcc = AccountManager.LookupAccount(email, password);
 
                     if (tempAcc == null)
                     {
@@ -126,9 +127,14 @@ $ end of string*/
                     break;
                 case 5:
                     Console.WriteLine("Are you sure you want to exit? y/n");
-                    char choice = Convert.ToChar(Console.ReadLine());
-                    char.ToLower(choice);
-                    if (choice == 'y')
+                    string? choice = Console.ReadLine();
+                    if(choice is not null)
+                    {
+                        input = Convert.ToChar(choice);
+                    }
+
+                    char.ToLower(input);
+                    if (input == 'y')
                     {
                         Console.WriteLine("Logging out....");
                         Console.WriteLine("Successfully Logged Out");
@@ -166,14 +172,14 @@ $ end of string*/
                             book = lib.getBook(isbnInput);
                         }
 
-                        if (book.checkBorrow())
+                        if (book.checkBorrow() && userAccount is not null)
                         {
                             AccountManager.addBookToAccount(lib.getBook(isbnInput), userAccount);
                             Console.WriteLine($"Book borrowed by user {userAccount.getUserName()}");
                         }
                         else
                         {
-                            Console.WriteLine("Book is currently borrowed");
+                            Console.WriteLine("An error occured, book may be borrowed or no valid account");
                         }
 
                         break;
@@ -226,14 +232,14 @@ $ end of string*/
                             room = lib.getRoom(idInput);
                         }
 
-                        if (room.checkBooked())
+                        if (room.checkBooked() && userAccount is not null)
                         {
                             AccountManager.addRoomToAccount(lib.getRoom(idInput), userAccount);
                             Console.WriteLine($"Room booked by user {userAccount.getUserName()}");
                         }
                         else
                         {
-                            Console.WriteLine("Room is currently booked");
+                            Console.WriteLine("An err occurred, room is currently booked or invalid account");
                         }
 
                         break;
@@ -261,28 +267,39 @@ $ end of string*/
         }
     }
 
-    static bool checkEmail(string email)
+    static bool checkEmail(string? email)
     {
-        return Regex.IsMatch(email, @"^[\w\.-]+@[\w\.-]+\.\w+$");
-    }
-
-    static bool checkPassword(string password)
-    {
-        if (Regex.IsMatch(password, @"^\w{8,}+$"))
+        if (email is not null)
         {
-            return true;
+            return Regex.IsMatch(email, @"^[\w\.-]+@[\w\.-]+\.\w+$");
         }
 
         return false;
     }
 
-    static bool checkUser(String user)
+    static bool checkPassword(string? password)
     {
-        if (Regex.IsMatch(user, @"^\w({3,})+$"))
+        if(password is not null)
         {
-            return true;
+            if (Regex.IsMatch(password, @"^\w{8,}$"))
+            {
+                return true;
+            }
         }
 
+
+        return false;
+    }
+
+    static bool checkUser(String? user)
+    {
+        if(user is not null)
+        {
+            if (Regex.IsMatch(user, @"^\w{3,}$"))
+            {
+                return true;
+            }
+        }
         return false;
     }
 }

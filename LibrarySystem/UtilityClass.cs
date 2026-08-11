@@ -2,15 +2,19 @@
 
 public static class UtilityClass<T>
 {
-    public static void dump(List<T> arr)
+    public static void dump(List<T>? arr)
     {
-        foreach (T value in arr)
+        if(arr is not null)
         {
-            if(value == null)
+            foreach (T value in arr)
             {
-                continue;
+                if (value == null)
+                {
+                    continue;
+                }
+                Console.Write(value.ToString() + " ");
             }
-            Console.Write(value.ToString() + " ");
         }
+
     }
 }

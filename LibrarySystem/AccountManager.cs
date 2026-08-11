@@ -4,7 +4,7 @@ using System.Reflection.Metadata.Ecma335;
 
 public static class AccountManager
 {
-	static List<Account> accounts;
+	static List<Account> accounts { get; set; }
 	static int i = 0;
 	 static AccountManager()
 	{
@@ -38,10 +38,10 @@ public static class AccountManager
 		return -1;
     }
 
-	public static int addBookToAccount(Book? b, Account a)
+	public static int addBookToAccount(Book? b, Account? a)
 	{
-
-		if (accounts.Contains(a))
+	
+		if (a is not null && accounts.Contains(a))
 		{
 			a.addBook(b);
 			return 0;
@@ -50,19 +50,23 @@ public static class AccountManager
 
     }
 
-	public static Account? LookupAccount(string e, string p)
+	public static Account? LookupAccount(string? e, string? p)
 	{
-		if(accounts.Exists(a => a.getEmail() == e && a.getPassword() == p))
+		if(e is not null && p is not null)
 		{
-			return accounts.Find(a => a.getEmail() == e && a.getPassword() == p);
-		}
+            if (accounts.Exists(a => a.getEmail() == e && a.getPassword() == p))
+            {
+                return accounts.Find(a => a.getEmail() == e && a.getPassword() == p);
+            }
 
-		return null;
+        }
+
+        return null;
 	}
 
-	public static List<Book>?  booksInAccount(Account a)
+	public static List<Book>?  booksInAccount(Account? a)
 	{
-		if (accounts.Contains(a))
+		if (a is not null && accounts.Contains(a))
 		{
 			return a.getBooks();
 		}
@@ -70,24 +74,30 @@ public static class AccountManager
 		return null;
 	}
 
-	public static int returnBook(int isbn, Account a)
+	public static int returnBook(int isbn, Account? a)
 	{
-		List<Book> bookArr = a.getBooks();
+		if(a is not null)
+		{
+            List<Book>? bookArr = a.getBooks();
+            if (bookArr is not null)
+            {
+                Book? book = bookArr.Find(r => r.getISBN() == isbn);
 
-
-        Book book = bookArr.Find(r => r.getISBN() == isbn);
-
-        if (book != null)
-        {
-            bookArr.Remove(book);
-            return 0;
+                if (book is not null)
+                {
+                    bookArr.Remove(book);
+                    return 0;
+                }
+            }
         }
+
+
         return -1;
 	}
 
-	public static int addRoomToAccount(Room? b, Account a)
+	public static int addRoomToAccount(Room? b, Account? a)
 	{
-        if (accounts.Contains(a))
+        if (a is not null && accounts.Contains(a))
         {
             a.addRoom(b);
             return 0;
@@ -95,9 +105,9 @@ public static class AccountManager
         return -1;
     }
 
-	public static List<Room> roomsInAccount(Account a)
+	public static List<Room>? roomsInAccount(Account? a)
 	{
-		if(accounts.Exists(u => u.getID() == a.getID()))
+		if(a is not null && accounts.Exists(u => u.getID() == a.getID()))
 		{
 			return a.getRooms();
 		}
@@ -106,17 +116,26 @@ public static class AccountManager
 
     }
 
-	public static int checkoutRoom(int bookID, Account a)
+	public static int checkoutRoom(int roomID, Account? a)
 	{
-        List<Room> bookArr = a.getRooms();
 
-		Room book = bookArr.Find(r => r.getId() == bookID);
+		if(a is not null)
+        {
+            List<Room>? roomArr = a.getRooms();
 
-		if(book != null)
-		{
-			bookArr.Remove(book);
-			return 0;
-		}
+            if (roomArr is not null)
+            {
+                Room? room = roomArr.Find(r => r.getId() == roomID);
+
+                if (room is not null)
+                {
+                    roomArr.Remove(room);
+                    return 0;
+                }
+            }
+
+        }
+
         return -1;
     }
 }

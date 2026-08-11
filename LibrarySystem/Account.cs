@@ -4,35 +4,38 @@ using System.Runtime.CompilerServices;
 
 public class Account
 {
-	string email;
+	string? email;
 	int id;
-	string userName;
-	string password;
-	List<Book> books;
-	List<Room> rooms;
+	string? userName;
+	string? password;
+	List<Book>? books;
+	List<Room>? rooms;
 	int i;
 	int k;
-	public Account(string e, string u, string p, int id)
+	public  Account(string? e, string? u, string? p, int id)
 	{
-		email = e;
-		userName = u;
-		password = p;
-		this.id = id;
-		i = 0;
-		k = 0;
-		books = new List<Book>();
-		rooms = new List<Room>();
+		if(e is not null && u is not null && p is not null)
+		{
+            email = e;
+            userName = u;
+            password = p;
+            this.id = id;
+            i = 0;
+            k = 0;
+            books = new List<Book>();
+            rooms = new List<Room>();
+        }
 	}
 
-	public string getUserName()
+	public string? getUserName()
 	{
 		return userName;
 	}
-	public string getEmail()
+	public string? getEmail()
 	{
 		return email;
 	}
-	public string getPassword()
+	public string? getPassword()
 	{
 		return password;
 	}
@@ -57,47 +60,57 @@ public class Account
 
 	public void addBook(Book? b)
 	{
-		books.Add(b);
+		if(b is not null && books is not null)
+		{
+            books.Add(b);
+        }
+
 	}
 
 	public void addRoom(Room? r)
 	{
-        rooms.Add(r);
-    }
-
-	public int removeBook(Book b)
-	{
-		if (books.Remove(b))
+		if(r is not null && rooms is not null)
 		{
-			return 0;
-		}
-		else
-		{
-			return -1;
-		}
-
-    }
-
-
-		public int removeRoom(Room r)
-	{
-        if (rooms.Remove(r))
-        {
-            return 0;
+            rooms.Add(r);
         }
-        else
-        {
+
+    }
+
+	public int removeBook(Book? b)
+	{
+		if(b is not null && books is not null)
+		{
+            if (books.Remove(b))
+            {
+                return 0;
+            }
+
+        }
             return -1;
-        }
-
     }
 
-	public List<Book> getBooks()
+
+		public int removeRoom(Room? r){      
+		
+
+		if (rooms is not null && r is not null)
+        {
+
+             if(rooms.Remove(r))
+			{
+                return 0;
+            }
+
+        }
+		return -1;
+    }
+
+	public List<Book>? getBooks()
 	{
 		return books;
 	}
 
-	public List<Room> getRooms()
+	public List<Room>? getRooms()
 	{
 		return rooms;
 	}
