@@ -27,7 +27,9 @@ public class RoomLimitReachedException : Exception
 {
     public RoomLimitReachedException() { }
     public RoomLimitReachedException(string message) : base(message) { }
-};
+}
+
+
 [Serializable]
 public class BookLimitReachedException : Exception
 {
@@ -56,5 +58,14 @@ public class BookBorrowedException: Exception
 public class AccountExistsException: Exception
 {
     public AccountExistsException(){}
-    public BookBorrowedException(string message) : base(message){}
+    public  AccountExistsException(string message) : base(message){ }
+
 }
+
+
+public class RoomNotFoundException: Exception
+{
+    public RoomNotFoundException() { }
+    public RoomNotFoundException(string message) : base(message) { }
+}
+

@@ -12,7 +12,8 @@ public class Program
         string? password = "";
         string? tempUser = "";
         char input=' ';
-
+        AccountRepositry accountRepository = new AccountRepositry();
+        AccountService accountService = new AccountService(accountRepository);
         /*^ start of string
 
         [\w\.-]+one or more word characters, dots, or hyphens
@@ -74,7 +75,7 @@ public class Program
                     int id = rand.Next(1, 1000);
                     Console.WriteLine("Creating User......");
                     userAccount = new Account(email, tempUser, password, id);
-                    AccountManager.addAccount(userAccount);
+                    accountRepository.addAccount(userAccount);
                     Console.WriteLine("Account Created Successfully");
                     user = tempUser;
                     break;
@@ -108,7 +109,7 @@ public class Program
 
                             Console.WriteLine("Logging in....");
 
-                            Account tempAcc = AccountManager.LookupAccount(email, password);
+                            Account tempAcc = accountRepository.LookupAccount(email, password);
                             userAccount = tempAcc;
                             user = userAccount.Username;
                         }
@@ -182,7 +183,7 @@ public class Program
 
                         if (book.CanBorrow)
                         {
-                            AccountManager.addBookToAccount(lib.getBook(isbnInput), userAccount);
+                            accountService.addBookToAccount(lib.getBook(isbnInput), userAccount);
                             Console.WriteLine($"Book borrowed by user {userAccount.Username}");
                         }
                         else
@@ -198,9 +199,9 @@ public class Program
                                 try
                                 {
                                     Console.WriteLine("Which book would you like to return");
-                                    UtilityClass<Book>.dump(AccountManager.booksInAccount(userAccount));
+                                    UtilityClass<Book>.dump(accountService.booksInAccount(userAccount));
                                     isbn = Convert.ToInt32(Console.ReadLine());
-                                    tempBook = AccountManager.returnBook(isbn, userAccount);
+                                    tempBook = accountService.returnBook(isbn, userAccount);
                                 }catch(BookNotFoundException e)
                                 {
                                     Console.WriteLine("Book not found");
@@ -210,7 +211,7 @@ public class Program
                         break;
 
                     case 3:
-                        UtilityClass<Book>.dump(AccountManager.booksInAccount(userAccount));
+                        UtilityClass<Book>.dump(accountService.booksInAccount(userAccount));
                         break;
                 }
 
@@ -245,7 +246,7 @@ public class Program
 
                         if (room.CanBook)
                         {
-                            AccountManager.addRoomToAccount(lib.getRoom(idInput), userAccount);
+                            accountService.addRoomToAccount(lib.getRoom(idInput), userAccount);
                             Console.WriteLine($"Room booked by user {userAccount.Username}");
                         }
                         else
@@ -257,9 +258,9 @@ public class Program
 
                     case 2:
                         Console.WriteLine("Which room would you like to checkout");
-                        UtilityClass<Room>.dump(AccountManager.roomsInAccount(userAccount));
+                        UtilityClass<Room>.dump(accountService.roomsInAccount(userAccount));
                         int id = Convert.ToInt32(Console.ReadLine());
-                        if (AccountManager.checkoutRoom(id, userAccount) == -1)
+                        if (accountService.checkoutRoom(id, userAccount) == null)
                         {
                             Console.WriteLine("An Error Occured");
                         }
@@ -270,7 +271,7 @@ public class Program
                         break;
 
                     case 3:
-                        UtilityClass<Room>.dump(AccountManager.roomsInAccount(userAccount));
+                        UtilityClass<Room>.dump(accountService.roomsInAccount(userAccount));
                         break;
                 }
 
@@ -296,6 +297,8 @@ public class Program
         {
             return Regex.IsMatch(email, @"^[\w\.-]+@[\w\.-]+\.\w+$");
         }
+        return false;
+    }
 
     static bool checkPassword(string password)
     {
@@ -317,5 +320,4 @@ public class Program
 
         return false;
     }
-}
 }

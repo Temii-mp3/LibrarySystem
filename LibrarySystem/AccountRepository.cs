@@ -1,6 +1,6 @@
 public class AccountRepositry : IAccountRepository
 {
-    private readonly List<Account> accounts = new();
+    public  readonly List<Account> accounts  = new();
 
 
     public Account addAccount(Account a)
@@ -40,33 +40,29 @@ public class AccountRepositry : IAccountRepository
 
         return account;
     }
+
+    public Account LookupAccount(Account a)
+    {
+        Account account = accounts.Find(f => f.Id == a.Id);
+        if (account is null)
+        {
+            throw new AccountNotFoundException("Account not found");
+        }
+
+        return account;
+    }
+
     public Account updateAccount(Account a)
     {
+        int indexofAccount = accounts.FindIndex(acc => acc.Id == a.Id);
 
+        if (accounts.Contains(a))
+        {
+            accounts.Insert(indexofAccount, a);
+            return a;
+        }
+
+        throw new AccountNotFoundException("Account not found");
     }
-    public Account addBookToAccount(Account a)
-    {
 
-    }
-
-    public List<Book> booksInAccount(Account a)
-    {
-
-    }
-    public List<Room> roomsInAccount(Account a)
-    {
-
-    }
-    public List<Room> addRoomToAccount(Room b, Account a)
-    {
-
-    }
-    public Book returnBook(int isbn, Account a)
-    {
-
-    }
-    public Room checkoutRoom(int bookID, Account a)
-    {
-
-    }
 }
