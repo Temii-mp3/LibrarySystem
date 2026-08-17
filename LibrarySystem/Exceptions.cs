@@ -1,4 +1,5 @@
 using System.Security.Cryptography.X509Certificates;
+using System.Xml.Xsl;
 
 [Serializable]
 public class AccountNotFoundException : Exception
@@ -58,18 +59,25 @@ public class InvalidInputException : Exception
     public InvalidInputException() { }
     public InvalidInputException(string message) : base(message) { }
 };
-
-public class BookBorrowedException: Exception
+[Serializable]
+public class BookBorrowedException : Exception
 {
     public BookBorrowedException() { }
     public BookBorrowedException(string message) : base(message) { }
 }
 
 
-
-public class RoomNotFoundException: Exception
+[Serializable]
+public class RoomNotFoundException : Exception
 {
     public RoomNotFoundException() { }
     public RoomNotFoundException(string message) : base(message) { }
 }
 
+
+[Serializable]
+public class LoginException: Exception
+{
+    public  LoginException() { }
+    public LoginException(string message) : base(message) { }
+}

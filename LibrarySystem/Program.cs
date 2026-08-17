@@ -1,6 +1,8 @@
 ﻿using LibrarySystem.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
+using System.Data;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -63,7 +65,7 @@ public class Program
                         tempUser = Console.ReadLine();
 
 
-                        while (checkUser(tempUser))
+                        while (!checkUser(tempUser))
                         {
                             Console.WriteLine("Invalid Username");
                             tempUser = Console.ReadLine();
@@ -71,7 +73,7 @@ public class Program
                         Console.WriteLine("Enter Password");
                         password = Console.ReadLine();
 
-                        while (checkPassword(password))
+                        while (!checkPassword(password))
                         {
                             Console.WriteLine("Invalid Password");
                             password = Console.ReadLine();
@@ -83,17 +85,27 @@ public class Program
                         {
                             throw new AccountExistsException("Account Exists");
                         }
-                        userAccount = new Account
+                        if (email is not null && password is not null && tempUser is not null)
                         {
-                            Email = email,
-                            Password = password,
-                            Username = tempUser
-                        };
+                            userAccount = new Account
+                            {
+                                Email = email,
+                                Password = password,
+                                Username = tempUser
+                            };
+                        }
+                        else
+                        {
+                            Console.WriteLine("You are missing a field");
+                        }
 
-                        library.Accounts.Add(userAccount);
-                        library.SaveChanges();
-                        Console.WriteLine("Account Created Successfully");
-                        user = tempUser;
+                        if (userAccount is not null)
+                        {
+                            library.Accounts.Add(userAccount);
+                            library.SaveChanges();
+                            Console.WriteLine("Account Created Successfully");
+                            user = tempUser;
+                        }
                         break;
                     }
                     catch (Exception e)
@@ -135,7 +147,6 @@ public class Program
                             if (userAccount is null)
                             {
                                 throw new AccountNotFoundException();
-                                break;
                             }
                             user = userAccount.Username;
                             break;
@@ -170,12 +181,33 @@ public class Program
                         break;
                     }
                     break;
+                case 6:
+                    try
+                    {
+                        Console.WriteLine("Are you sure you want to delete account?");
+                        choice = Console.ReadLine();
+
+                        if (choice is not null)
+                            input = Convert.ToChar(choice);
+                        if (input is 'y' && userAccount is not null)
+                        {
+                            Console.WriteLine("Deleting account...");
+                            library.Accounts.Remove(userAccount);
+                        }
+                        else
+                            throw new LoginException("You need to log in");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                    break;
+                default:
+                    throw new InvalidInputException("Invalid input");
+
             }
 
         } while (userInput != 6);
-
-
-
 
         void bookServices()
         {
@@ -191,60 +223,61 @@ public class Program
                 {
                     case 1:
                         Book? book;
-                        string isbnInput;
+                        string? isbnInput;
                         try
                         {
-                            do
+                            if (userAccount is null)
+                                throw new LoginException("You need to log in");
+                            Console.WriteLine("Which Book would you like to Borrow? type ISBN");
+                            library.Books.ForEachAsync(Console.WriteLine);
+                            isbnInput = Console.ReadLine();
+                            book = library.Books.FirstOrDefault(b => b.Isbn == isbnInput);
+                            if (book is null)
+                                throw new BookNotFoundException("Book not found");
+                            if (book.BorrowedBy is null)
                             {
-                                Console.WriteLine("Which Book would you like to Borrow? type ISBN");
-                                library.Books.ForEachAsync(Console.WriteLine);
-                                isbnInput = Console.ReadLine();
-                                book = library.Books.FirstOrDefault(b => b.Isbn == isbnInput);
-                            } while (book is null);
+                                book.BorrowedBy = userAccount.Id;
+                                Console.WriteLine($"Book borrowed!");
+                                library.SaveChanges();
+                            }
+                            else
+                                Console.WriteLine("An error occured, book is borrowed or no valid account");
                         }
                         catch (BookNotFoundException e)
                         {
                             Console.WriteLine(e.Message);
-                            break;
                         }
 
-                        if (book.BorrowedBy is not null && userAccount is not null)
-                        {
-                            book.BorrowedBy = userAccount.Id;
-                            Console.WriteLine($"Book borrowed!");
-                        }
-                        else
-                        {
-                            Console.WriteLine("An error occured, book may be borrowed or no valid account");
-                        }
+
 
                         break;
 
                     case 2:
-                        string isbn;
-                        Book tempBook;
                         try
                         {
+                            if (userAccount is null)
+                                throw new LoginException("You need to log in");
                             Console.WriteLine("Which book would you like to return");
                             library.Books.ForEachAsync(Console.WriteLine);
-                            isbn = Console.ReadLine();
-                            book = library.Books.FirstOrDefault(b => b.Isbn == isbn);
+                            isbnInput = Console.ReadLine();
+                            book = library.Books.FirstOrDefault(b => b.Isbn == isbnInput);
                             if (book is null)
                                 throw new BookNotFoundException("Book not found");
+                            if (book is not null)
+                            {
+                                book.BorrowedBy = null;
+                                Console.WriteLine("Book returned successfully");
+                                library.SaveChanges();
+
+                            }
                         }
-                        catch (BookNotFoundException e)
+                        catch (Exception e)
                         {
                             Console.WriteLine(e.Message);
-                            break;
-                        }
-                        if (book is not null && userAccount is not null)
-                        {
-                            book.BorrowedBy = null;
-                            Console.WriteLine("Book returned successfully");
-                            break;
-                        }
 
-                        throw new GenericException("Something went wrong");
+                        }
+                        break;
+
 
                     case 3:
                         library.Books.ForEachAsync(Console.WriteLine);
@@ -269,48 +302,64 @@ public class Program
                 switch (userInput)
                 {
                     case 1:
-                        Console.WriteLine("Which room would you like to Borrow? type ID");
-                        library.Rooms.ForEachAsync(Console.WriteLine);
-
-                        string idInput = Console.ReadLine();
-                        Room? room = library.Rooms.FirstOrDefault(r => r.Id == idInput);
-
-                        while (room == null)
+                        try
                         {
-                            Console.WriteLine("Invalid ID. Try Again");
-                            idInput = Console.ReadLine();
-                            room = library.Rooms.FirstOrDefault(r => r.Id == idInput);
-                        }
+                            if (userAccount is null)
+                                throw new LoginException("You need to log in");
 
-                        if (room.Bookedby is null && userAccount is null)
-                        {
-                            room.Bookedby = userAccount.Id;
-                            
-                            Console.WriteLine($"Room booked by user {userAccount.Username}");
-                        }
-                        else
-                        {
-                            Console.WriteLine("An err occurred, room is currently booked or invalid account");
-                        }
+                            Console.WriteLine("Which room would you like to Borrow? type ID");
+                            library.Rooms.ForEachAsync(Console.WriteLine);
 
+                            string? idInput = Console.ReadLine();
+                            Room? room = library.Rooms.FirstOrDefault(r => r.Id == idInput);
+
+                            if (room == null)
+                                throw new RoomNotFoundException("Room not found");
+
+                            if (room.Bookedby is null)
+                            {
+                                room.Bookedby = userAccount.Id;
+                                Console.WriteLine($"Room booked by user {userAccount.Username}");
+                                library.SaveChanges();
+
+                            }
+                            else
+                            {
+                                Console.WriteLine("An err occurred, room is currently booked");
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+
+                        }
                         break;
 
-                    case 2:
-                        Console.WriteLine("Which room would you like to checkout");
-                        library.Rooms.ForEachAsync(Console.WriteLine);
-                        idInput = Console.ReadLine();
-                        room = library.Rooms.FirstOrDefault(r => r.Id == idInput);
-                        if (room is null)
-                            throw new RoomNotFoundException("Room not found");
 
-                        if (userAccount is not null)
+                    case 2:
+                        try
                         {
+                            if (userAccount is null)
+                                throw new LoginException("You need to log in");
+                            string? idInput;
+                            Room? room;
+                            Console.WriteLine("Which room would you like to checkout");
+                            library.Rooms.ForEachAsync(Console.WriteLine);
+                            idInput = Console.ReadLine();
+                            room = library.Rooms.FirstOrDefault(r => r.Id == idInput);
+                            if (room is null)
+                                throw new RoomNotFoundException("Room not found");
                             room.Bookedby = null;
                             Console.WriteLine("Room checked out successfully!");
+                            library.SaveChanges();
                             break;
                         }
-                        else
-                            throw new GenericException("Something went wrong");
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                            break;
+                        }
+
                     case 3:
                         library.Rooms.ForEachAsync(Console.WriteLine);
                         break;
@@ -327,7 +376,8 @@ public class Program
                                 "3. Book Services\n" +
                                 "4. Room Services\n" +
                                 "5. Log out\n" +
-                                "6. Quit");
+                                "6. Delete Account\n" +
+                                "7. Quit");
             Console.WriteLine($"Currently Logged in as: {(string.IsNullOrEmpty(user) ? "Guest" : user)}");
         }
     }
@@ -341,22 +391,20 @@ public class Program
         return false;
     }
 
-    static bool checkPassword(string password)
+    static bool checkPassword(string? password)
     {
-        if (Regex.IsMatch(password, @"^\w{8,}$"))
+        if (password is not null)
         {
-            return true;
+            return Regex.IsMatch(password, @"^\w{8,}$");
         }
-
-
         return false;
     }
 
-    static bool checkUser(String user)
+    static bool checkUser(String? user)
     {
-        if (Regex.IsMatch(user, @"^\w{3,}$"))
+        if (user is not null)
         {
-            return true;
+            return Regex.IsMatch(user, @"^\w{3,}$");
         }
 
         return false;
