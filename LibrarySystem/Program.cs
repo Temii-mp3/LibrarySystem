@@ -8,7 +8,7 @@ public class Program
 {
     static void Main(String[] args)
     {
-        LibraryContext library = new LibraryContext();
+        LibraryContext library = new();
 
 
         int userInput;
@@ -17,10 +17,6 @@ public class Program
         string? password = "";
         string? tempUser = "";
         char input = ' ';
-        foreach (var b in library.Books)
-        {
-            Console.WriteLine(b.Isbn);
-        }
 
         /*^ start of string
 
