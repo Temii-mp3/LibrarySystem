@@ -1,9 +1,19 @@
+using System.Security.Cryptography.X509Certificates;
+
 [Serializable]
 public class AccountNotFoundException : Exception
 {
     public AccountNotFoundException() { }
     public AccountNotFoundException(string message) : base(message) { }
 };
+
+[Serializable]
+public class AccountExistsException : Exception
+{
+    public AccountExistsException() { }
+    public AccountExistsException(string message) : base(message) { }
+}
+
 [Serializable]
 public class InvalidAccountException : Exception
 {
@@ -55,12 +65,6 @@ public class BookBorrowedException: Exception
     public BookBorrowedException(string message) : base(message) { }
 }
 
-public class AccountExistsException: Exception
-{
-    public AccountExistsException(){}
-    public  AccountExistsException(string message) : base(message){ }
-
-}
 
 
 public class RoomNotFoundException: Exception
