@@ -15,7 +15,7 @@ namespace LibrarySystemTests
         [TestInitialize]
         public void setup()
         {
-            Account account = new Account
+            account = new Account
             {
                 Email = "janedoe@gmail.com",
                 Password = "janedoeiscool",
@@ -34,11 +34,12 @@ namespace LibrarySystemTests
         public void AccountCreated_InsertsToDB()
         {
             context.Accounts.Add(account);
+            context.SaveChanges();
 
-            Assert.IsTrue(context.Accounts.Contains(account));
+            Assert.IsTrue(context.Accounts.Any(a => a.Id == account.Id));
         }
 
 
     }
-    
+
 }
