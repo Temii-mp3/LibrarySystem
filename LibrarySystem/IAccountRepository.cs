@@ -2,17 +2,17 @@
 
 public interface IAccountRepository
 {
-    public Task<Account> addAccount(Account a);
-    public Task<Account> deleteAccount(Account a);
+    public Task<Account> AddAccount(Account a);
+    public Task<Account> DeleteAccount(Account a);
     public Task<Account> LookupAccount(string email, string password);
     public Task<Account> LookupAccount(Account a);
-    public Task<Account> updateAccount(Account a);
-    public Task<Book> addBookToAccount(Account a, Book b);
-    public Task<List<Book>> booksInAccount(Account a);
-    public Task<List<Room>> roomsInAccount(Account a);
-    public Task<Room> addRoomToAccount(Room b, Account a);
-    public Task<Book> returnBook(int isbn, Account a);
-    public Task<Room> checkoutRoom(int bookID, Account a);
+    public Task<Account> UpdateAccount(Account a);
+    public Task<Book> AddBookToAccount(Account a, Book b);
+    public Task<List<Book>> BooksInAccount(Account a);
+    public Task<List<Room>> RoomsInAccount(Account a);
+    public Task<Room> AddRoomToAccount(Room b, Account a);
+    public Task<Book> ReturnBook(string isbn, Account a);
+    public Task<Room> CheckoutRoom(string bookID, Account a);
 
 
 }

@@ -4,14 +4,14 @@ using System.Xml.Xsl;
 [Serializable]
 public class AccountNotFoundException : Exception
 {
-    public AccountNotFoundException() { }
+    public AccountNotFoundException(): base("Account not found"){ }
     public AccountNotFoundException(string message) : base(message) { }
 };
 
 [Serializable]
 public class AccountExistsException : Exception
 {
-    public AccountExistsException(): base("Account not found") { }
+    public AccountExistsException(): base("Account already exists") { }
     public AccountExistsException(string message) : base(message) { }
 }
 

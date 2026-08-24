@@ -1,5 +1,5 @@
 ﻿using System;
-using LibrarySystem.Models
+using LibrarySystem.Models;
 public class AccountService : IAccountService
 {
     const int BOOKLIMIT = 5;
@@ -10,78 +10,69 @@ public class AccountService : IAccountService
         accountRepository = _repo;
     }
 
-    public Task<Account> addBookToAccount(Book b, Account a)
+    public async Task<Book> AddBookToAccount(Book b, Account a)
     {
-        if (accountRepository.LookupAccount(a) is null)
-        {
+        Account? user = await accountRepository.LookupAccount(a);
+        if (user is null)
             throw new AccountNotFoundException("Account not found");
-        }
-
-        if (a.Books.Count > 5)
-        {
+        if (user.Books.Count > BOOKLIMIT)
             throw new BookLimitReachedException($"Book Limit of {BOOKLIMIT} has been reached");
-        }
-
-        a.addBook(b);
-        return a;
+        b.BorrowedBy = user.Id;
+        return b;
     }
 
-    public List<Book> booksInAccount(Account a)
+    public async Task<ICollection<Book>> BooksInAccount(Account a)
     {
+        Account? user = await accountRepository.LookupAccount(a);
+        if (user is null)
+            throw new AccountNotFoundException("Account not found");
 
-        if (a is not null && accountRepository.LookupAccount(a) is not null)
-        {
-            return a.Books;
-        }
-
-        throw new AccountNotFoundException("Account not found");
+        return user.Books;
 
 
     }
-    public List<Room> roomsInAccount(Account a)
+    public async Task<ICollection<Room>> RoomsInAccount(Account a)
     {
-        if (a is not null && accountRepository.LookupAccount(a) is not null)
-        {
-            return a.Rooms;
-        }
+        Account? user = await accountRepository.LookupAccount(a);
+        if (user is null)
+            throw new AccountNotFoundException("Account not found");
 
-        throw new AccountNotFoundException("Account not found");
+        return user.Rooms;
 
     }
-    public Room addRoomToAccount(Room b, Account a)
+    public async Task<Room> AddRoomToAccount(Room b, Account a)
     {
-        if (accountRepository.LookupAccount(a) is not null && a.Rooms.Count() < ROOMLIMIT)
-        {
-            a.addRoom(b);
-            return b;
-        }
-        throw new RoomLimitReachedException("Room Limit of {LIMIT} has been reached");
+        Account? user = await accountRepository.LookupAccount(a);
+        if (user is null)
+            throw new AccountNotFoundException();
+        if (a.Rooms.Count > ROOMLIMIT)
+            throw new RoomLimitReachedException("Room Limit of {LIMIT} has been reached");
+        b.Bookedby = user.Id;
+        return b;
     }
-    public Book returnBook(int isbn, Account a)
+    public async Task<Book> ReturnBook(string isbn, Account a)
     {
-        List<Book> bookArr = a.Books;
+        Account? user = await accountRepository.LookupAccount(a);
 
+        if (user is null)
+            throw new AccountNotFoundException();
+        Book? book = user.Books.FirstOrDefault(b => b.Isbn == isbn);
+        if (book is null)
+            throw new BookNotFoundException();
+        book.BorrowedBy = null;
+        return book;
 
-        Book book = bookArr.Find(r => r.ISBN == isbn);
-
-        if (book != null)
-        {
-            bookArr.Remove(book);
-            return book;
-        }
-        throw new BookNotFoundException("Book not found");
     }
-    public Room checkoutRoom(int roomID, Account a)
+    public async Task<Room> CheckoutRoom(string roomID, Account a)
     {
-        List<Room> roomArr = a.Rooms;
+        Account? user = await accountRepository.LookupAccount(a);
 
-        Room room = roomArr.Find(r => r.Id == roomID);
-
-        if (room != null)
-        {
-            roomArr.Remove(room);
-            return room;
-        }
-        throw new RoomNotFoundException("Room not found");
+        if (user is null)
+            throw new AccountNotFoundException();
+        Room? room = user.Rooms.FirstOrDefault(b => b.Id == roomID);
+        if (room is null)
+            throw new BookNotFoundException();
+        room.Bookedby = null;
+        return room;
     }
 }

@@ -3,10 +3,10 @@ using System;
 
 public interface IAccountService
 {
-    public Task<Book> addBookToAccount(Book b, Account a);
-    public Task<List<Book>> booksInAccount(Account a);
-    public Task<List<Room>> roomsInAccount(Account a);
-    public Task<Room> addRoomToAccount(Room b, Account a);
-    public Task<Book> returnBook(int isbn, Account a);
-    public Task<Room> checkoutRoom(int bookID, Account a);
+    public Task<Book> AddBookToAccount(Book b, Account a);
+    public Task<ICollection<Book>> BooksInAccount(Account a);
+    public Task<ICollection<Room>> RoomsInAccount(Account a);
+    public Task<Room> AddRoomToAccount(Room b, Account a);
+    public Task<Book> ReturnBook(string isbn, Account a);
+    public Task<Room> CheckoutRoom(string bookID, Account a);
 }

@@ -12,7 +12,7 @@ public class AccountRepositry : IAccountRepository
     }
 
 
-    public async Task<Account> addAccount(Account a)
+    public async Task<Account> AddAccount(Account a)
     {
         if (await _context.Accounts.AnyAsync(f => f.Email == a.Email))
             throw new AccountExistsException("Account already exists");
@@ -24,7 +24,7 @@ public class AccountRepositry : IAccountRepository
 
     }
 
-    public async Task<Account> deleteAccount(Account a)
+    public async Task<Account> DeleteAccount(Account a)
     {
         if (!(await _context.Accounts.AnyAsync(f => f.Id == a.Id)))
             throw new AccountNotFoundException("Account not found");
@@ -53,7 +53,7 @@ public class AccountRepositry : IAccountRepository
     }
 
 
-    public async Task<Account> updateAccount(Account a)
+    public async Task<Account> UpdateAccount(Account a)
     {
         Account? account = await _context.Accounts.FirstOrDefaultAsync(f => f.Id == a.Id);
         account = a;
@@ -63,7 +63,7 @@ public class AccountRepositry : IAccountRepository
     }
 
 
-    public async Task<Book> addBookToAccount(Account a, Book b)
+    public async Task<Book> AddBookToAccount(Account a, Book b)
     {
         Account? account = await _context.Accounts.FirstOrDefaultAsync(f => f.Id == a.Id);
         if (account is null)
@@ -74,7 +74,7 @@ public class AccountRepositry : IAccountRepository
         throw new GenericException();
     }
 
-    public async Task<List<Book>> booksInAccount(Account a)
+    public async Task<List<Book>> BooksInAccount(Account a)
     {
         Account? account = await _context.Accounts.FirstOrDefaultAsync(f => f.Id == a.Id);
         if (account is null)
@@ -84,7 +84,7 @@ public class AccountRepositry : IAccountRepository
 
         return books;
     }
-    public async Task<List<Room>> roomsInAccount(Account a)
+    public async Task<List<Room>> RoomsInAccount(Account a)
     {
         Account? account = await _context.Accounts.FirstOrDefaultAsync(f => f.Id == a.Id);
         if (account is null)
@@ -94,7 +94,7 @@ public class AccountRepositry : IAccountRepository
 
         return rooms;
     }
-    public async Task<Room> addRoomToAccount(Room b, Account a)
+    public async Task<Room> AddRoomToAccount(Room b, Account a)
     {
         Account? account = await _context.Accounts.FirstOrDefaultAsync(f => f.Id == a.Id);
         if (account is null)
@@ -105,7 +105,7 @@ public class AccountRepositry : IAccountRepository
         throw new GenericException();
     }
 
-    public async Task<Book> returnBook(string isbn, Account a)
+    public async Task<Book> ReturnBook(string isbn, Account a)
     {
         Account? account = await _context.Accounts.FirstOrDefaultAsync(f => f.Id == a.Id);
         if (account is null)
