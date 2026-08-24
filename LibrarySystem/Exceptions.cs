@@ -4,14 +4,14 @@ using System.Xml.Xsl;
 [Serializable]
 public class AccountNotFoundException : Exception
 {
-    public AccountNotFoundException() { }
+    public AccountNotFoundException(): base("Account not found"){ }
     public AccountNotFoundException(string message) : base(message) { }
 };
 
 [Serializable]
 public class AccountExistsException : Exception
 {
-    public AccountExistsException() { }
+    public AccountExistsException(): base("Account already exists") { }
     public AccountExistsException(string message) : base(message) { }
 }
 
@@ -24,13 +24,13 @@ public class InvalidAccountException : Exception
 [Serializable]
 public class BookNotFoundException : Exception
 {
-    public BookNotFoundException() { }
+    public BookNotFoundException(): base("Book not found"){ }
     public BookNotFoundException(string message) : base(message) { }
 };
 [Serializable]
 public class GenericException : Exception
 {
-    public GenericException() { }
+    public GenericException() : base("Something went wrong") { }
     public GenericException(string message) : base(message) { }
 };
 [Serializable]
@@ -50,7 +50,7 @@ public class BookLimitReachedException : Exception
 [Serializable]
 public class NotLoggedInException : Exception
 {
-    public NotLoggedInException() { }
+    public NotLoggedInException(): base("You need to Log in") { }
     public NotLoggedInException(string message) : base(message) { }
 };
 [Serializable]
