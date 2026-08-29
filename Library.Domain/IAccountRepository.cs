@@ -1,4 +1,4 @@
-﻿using LibrarySystem.Models;
+﻿using LibraryDomain.Models;
 
 public interface IAccountRepository
 {

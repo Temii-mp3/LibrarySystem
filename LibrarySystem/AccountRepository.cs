@@ -1,5 +1,4 @@
-﻿using LibrarySystem.Models;
-
+﻿using LibraryDomain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 

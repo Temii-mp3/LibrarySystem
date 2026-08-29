@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LibrarySystem.Models;
+namespace LibraryDomain.Models;
 
 public partial class Room
 {

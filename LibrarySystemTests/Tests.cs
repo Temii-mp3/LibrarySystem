@@ -1,6 +1,6 @@
 ﻿
 
-using LibrarySystem.Models;
+using LibraryDomain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibrarySystemTests

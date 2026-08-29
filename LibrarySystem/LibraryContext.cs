@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibrarySystem.Models;
+namespace LibraryDomain.Models;
 
 public partial class LibraryContext : DbContext
 {

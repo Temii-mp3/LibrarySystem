@@ -1,4 +1,4 @@
-﻿using LibrarySystem.Models;
+﻿using LibraryDomain.Models;
 using System;
 
 public interface IAccountService
