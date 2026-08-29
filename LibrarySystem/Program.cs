@@ -8,11 +8,16 @@ using System.Xml.Linq;
 
 public class Program
 {
+
     static void Main(String[] args)
     {
-        LibraryContext library = new();
-
-
+        RunProgram();
+    }
+    static async void RunProgram()
+    {
+        LibraryContext context = new();
+        AccountRepositry repo = new(context);
+        AccountService service = new(repo);
         int userInput;
         string? user = "";
         string? email = "";
@@ -38,6 +43,15 @@ public class Program
         Account? userAccount = null;
         do
         {
+
+            try
+            {
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
             mainMenu();
             userInput = Convert.ToInt32(Console.ReadLine());
@@ -81,7 +95,9 @@ public class Program
 
                         Console.WriteLine("Creating User......");
 
-                        if (library.Accounts.Any(f => f.Email == email))
+                        var result = repo.LookupAccount(email);
+
+                        if (result.Result is not null)
                         {
                             throw new AccountExistsException("Account Exists");
                         }
@@ -101,8 +117,7 @@ public class Program
 
                         if (userAccount is not null)
                         {
-                            library.Accounts.Add(userAccount);
-                            library.SaveChanges();
+                            await repo.AddAccount(userAccount);
                             Console.WriteLine("Account Created Successfully");
                             user = tempUser;
                         }
@@ -143,7 +158,7 @@ public class Program
                             }
 
                             Console.WriteLine("Logging in....");
-                            userAccount = library.Accounts.SingleOrDefault(account => account.Email == email);
+                            userAccount = await repo.LookupAccount(email, password);
                             if (userAccount is null)
                             {
                                 throw new AccountNotFoundException();
@@ -192,7 +207,11 @@ public class Program
                         if (input is 'y' && userAccount is not null)
                         {
                             Console.WriteLine("Deleting account...");
-                            library.Accounts.Remove(userAccount);
+                            if (repo.DeleteAccount(userAccount) is not null)
+                            {
+                                Console.WriteLine("Account deleted");
+                            }
+                            throw new GenericException("Account could not be deleted");
                         }
                         else
                             throw new LoginException("You need to log in");
@@ -209,7 +228,7 @@ public class Program
 
         } while (userInput != 6);
 
-        void bookServices()
+        async void bookServices()
         {
             do
             {
@@ -229,21 +248,18 @@ public class Program
                             if (userAccount is null)
                                 throw new LoginException("You need to log in");
                             Console.WriteLine("Which Book would you like to Borrow? type ISBN");
-                            library.Books.ForEachAsync(Console.WriteLine);
+                            repo.PrintBooks();
                             isbnInput = Console.ReadLine();
-                            book = library.Books.FirstOrDefault(b => b.Isbn == isbnInput);
+                            book = await repo.GetBookfromDb(isbnInput);
                             if (book is null)
                                 throw new BookNotFoundException("Book not found");
-                            if (book.BorrowedBy is null)
-                            {
-                                book.BorrowedBy = userAccount.Id;
-                                Console.WriteLine($"Book borrowed!");
-                                library.SaveChanges();
-                            }
-                            else
-                                Console.WriteLine("An error occured, book is borrowed or no valid account");
+                            if (book.BorrowedBy is not null)
+                                throw new BookBorrowedException();
+                            if (await repo.AddBookToAccount(userAccount, book) is not null)
+                                Console.WriteLine("Book Borrowed Successfully!");
+
                         }
-                        catch (BookNotFoundException e)
+                        catch (Exception e)
                         {
                             Console.WriteLine(e.Message);
                         }
@@ -258,18 +274,10 @@ public class Program
                             if (userAccount is null)
                                 throw new LoginException("You need to log in");
                             Console.WriteLine("Which book would you like to return");
-                            library.Books.ForEachAsync(Console.WriteLine);
+                            repo.PrintBorrowedBooks(userAccount);
                             isbnInput = Console.ReadLine();
-                            book = library.Books.FirstOrDefault(b => b.Isbn == isbnInput);
-                            if (book is null)
-                                throw new BookNotFoundException("Book not found");
-                            if (book is not null)
-                            {
-                                book.BorrowedBy = null;
-                                Console.WriteLine("Book returned successfully");
-                                library.SaveChanges();
-
-                            }
+                            if (await repo.ReturnBook(userAccount, isbnInput) is not null)
+                                Console.WriteLine("Book Returned Successfully");
                         }
                         catch (Exception e)
                         {
@@ -280,7 +288,7 @@ public class Program
 
 
                     case 3:
-                        library.Books.ForEachAsync(Console.WriteLine);
+                        repo.PrintBorrowedBooks(userAccount);
                         break;
                 }
 
@@ -288,7 +296,7 @@ public class Program
 
         }
 
-        void roomServices()
+        async void roomServices()
         {
             do
             {
@@ -308,25 +316,17 @@ public class Program
                                 throw new LoginException("You need to log in");
 
                             Console.WriteLine("Which room would you like to Borrow? type ID");
-                            library.Rooms.ForEachAsync(Console.WriteLine);
+                            repo.PrintRooms();
 
                             string? idInput = Console.ReadLine();
-                            Room? room = library.Rooms.FirstOrDefault(r => r.Id == idInput);
+                            Room? room = await repo.GetRoomFromDb(idInput);
 
                             if (room == null)
                                 throw new RoomNotFoundException("Room not found");
-
-                            if (room.Bookedby is null)
-                            {
-                                room.Bookedby = userAccount.Id;
-                                Console.WriteLine($"Room booked by user {userAccount.Username}");
-                                library.SaveChanges();
-
-                            }
-                            else
-                            {
-                                Console.WriteLine("An err occurred, room is currently booked");
-                            }
+                            if (room.Bookedby is not null)
+                                throw new RoomBookedException();
+                            if (await repo.AddRoomToAccount(room, userAccount) is not null)
+                                Console.WriteLine("Room Booked Successfully");
                         }
                         catch (Exception e)
                         {
@@ -344,14 +344,10 @@ public class Program
                             string? idInput;
                             Room? room;
                             Console.WriteLine("Which room would you like to checkout");
-                            library.Rooms.ForEachAsync(Console.WriteLine);
+                            repo.PrintRooms();
                             idInput = Console.ReadLine();
-                            room = library.Rooms.FirstOrDefault(r => r.Id == idInput);
-                            if (room is null)
-                                throw new RoomNotFoundException("Room not found");
-                            room.Bookedby = null;
-                            Console.WriteLine("Room checked out successfully!");
-                            library.SaveChanges();
+                            if (await repo.CheckoutRoom(userAccount, idInput) is not null)
+                                Console.WriteLine("Room Checkout Out Successfully");
                             break;
                         }
                         catch (Exception e)
@@ -361,7 +357,7 @@ public class Program
                         }
 
                     case 3:
-                        library.Rooms.ForEachAsync(Console.WriteLine);
+                        repo.PrintBookedRooms(userAccount);
                         break;
                 }
 

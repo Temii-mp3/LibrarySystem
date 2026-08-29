@@ -1,6 +1,7 @@
 ﻿using LibrarySystem.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 public class AccountRepositry : IAccountRepository
 {
@@ -43,6 +44,15 @@ public class AccountRepositry : IAccountRepository
         return account;
     }
 
+    public async Task<Account?> LookupAccount(string email)
+    {
+        Account? account = await _context.Accounts.FirstOrDefaultAsync(f => f.Email == email);
+
+        if (account is null)
+            return null;
+        return account;
+    }
+
     public async Task<Account> LookupAccount(Account a)
     {
         Account? account = await _context.Accounts.FirstOrDefaultAsync(f => f.Id == a.Id);
@@ -65,9 +75,12 @@ public class AccountRepositry : IAccountRepository
 
     public async Task<Book> AddBookToAccount(Account a, Book b)
     {
+
         Account? account = await _context.Accounts.FirstOrDefaultAsync(f => f.Id == a.Id);
         if (account is null)
             throw new NotLoggedInException();
+        if (b.BorrowedBy is not null)
+            throw new BookBorrowedException();
         account.Books.Add(b);
         if (await _context.SaveChangesAsync() >= 1)
             return b;
@@ -105,7 +118,7 @@ public class AccountRepositry : IAccountRepository
         throw new GenericException();
     }
 
-    public async Task<Book> ReturnBook(string isbn, Account a)
+    public async Task<Book> ReturnBook( Account a, string isbn)
     {
         Account? account = await _context.Accounts.FirstOrDefaultAsync(f => f.Id == a.Id);
         if (account is null)
@@ -120,7 +133,7 @@ public class AccountRepositry : IAccountRepository
             return book;
         throw new GenericException();
     }
-    public async Task<Room> CheckoutRoom(string roomID, Account a)
+    public async Task<Room> CheckoutRoom(Account a, string roomID)
     {
         Account? account = await _context.Accounts.FirstOrDefaultAsync(f => f.Id == a.Id);
         if (account is null)
@@ -135,4 +148,49 @@ public class AccountRepositry : IAccountRepository
             return room;
         throw new GenericException();
     }
+
+    public void PrintBooks()
+    {
+         _context.Books.ForEachAsync(Console.WriteLine);
+    }
+
+
+    public void PrintRooms()
+    {
+         _context.Rooms.ForEachAsync(Console.WriteLine);
+    }
+
+
+    public async Task<Book> GetBookfromDb(string isbn)
+    {
+        Book? book = await _context.Books.FirstOrDefaultAsync(b => b.Isbn == isbn);
+        if (book is null)
+            throw new BookNotFoundException();
+        return book;
+    }
+    public async Task<Room> GetRoomFromDb(string id)
+    {
+        Room? room = await _context.Rooms.FirstOrDefaultAsync(b => b.Id == id);
+        if (room is null)
+            throw new RoomNotFoundException();
+        return room;
+    }
+
+    public void PrintBorrowedBooks(Account user)
+    {
+        foreach (var item in user.Books)
+        {
+            Console.WriteLine(item);
+        }
+    }
+
+    public void PrintBookedRooms(Account user)
+    {
+        foreach (var item in user.Rooms)
+        {
+            Console.WriteLine(item);
+        }
+    }
+
+
 }

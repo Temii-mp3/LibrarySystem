@@ -66,6 +66,12 @@ public class BookBorrowedException : Exception
     public BookBorrowedException(string message) : base(message) { }
 }
 
+[Serializable]
+public class RoomBookedException : Exception{
+    public RoomBookedException() : base("Room is currently booked") { }
+    public RoomBookedException(string message) : base(message) { }
+}
+
 
 [Serializable]
 public class RoomNotFoundException : Exception
