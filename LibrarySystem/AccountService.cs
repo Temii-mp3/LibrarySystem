@@ -5,7 +5,7 @@ public class AccountService : IAccountService
     const int BOOKLIMIT = 5;
     const int ROOMLIMIT = 1;
     private readonly IAccountRepository accountRepository;
-    public AccountService(AccountRepositry _repo)
+    public AccountService(IAccountRepository _repo)
     {
         accountRepository = _repo;
     }
