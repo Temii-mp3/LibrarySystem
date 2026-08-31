@@ -1,0 +1,1 @@
+﻿public record CreateAccountRequest(string Email, string Password, string Username);

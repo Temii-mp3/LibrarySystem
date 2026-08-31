@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 Library.Api/appsettings.json
+Library.Api/Library.db

@@ -1,5 +1,7 @@
 using LibraryDomain;
+using LibraryDomain.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -62,10 +64,14 @@ builder.Services.AddSwaggerGen(c =>
         [new OpenApiSecuritySchemeReference("Bearer", document)] = []
     });
 });
+// in Program.cs before building the app or in startup
+var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Library.db");
+Console.WriteLine($"DB path: {dbPath}, Exists: {System.IO.File.Exists(dbPath)}");
 builder.Services.AddScoped<IAccountRepository, AccountRepositry>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
 builder.Services.AddDbContext<LibraryDomain.Models.LibraryContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("Default") ?? "Data Source=Library.db"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("LibraryDb") ?? "Data Source=Library.db"));
 
 var app = builder.Build();
 
