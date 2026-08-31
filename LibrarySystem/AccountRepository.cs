@@ -14,14 +14,17 @@ public class AccountRepositry : IAccountRepository
 
     public async Task<Account> AddAccount(Account a)
     {
-        if (await _context.Accounts.AnyAsync(f => f.Email == a.Email))
-            throw new AccountExistsException("Account already exists");
-
-        await _context.Accounts.AddAsync(a);
-        if (await _context.SaveChangesAsync() >= 1)
-            return a;
+        try
+        {
+            await _context.Accounts.AddAsync(a);
+            if (await _context.SaveChangesAsync() >= 1)
+                return a;
+        }
+        catch (DbUpdateException)
+        {
+            throw new GenericException("Something went wrong");
+        }
         throw new GenericException("Something went wrong");
-
     }
 
     public async Task<Account> DeleteAccount(Account a)

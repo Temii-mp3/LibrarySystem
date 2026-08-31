@@ -1,18 +1,23 @@
-﻿using System;
-using LibraryDomain.Models;
+﻿using LibraryDomain.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using System;
+using System.Text.RegularExpressions;
 public class AccountService : IAccountService
 {
     const int BOOKLIMIT = 5;
     const int ROOMLIMIT = 1;
-    private readonly IAccountRepository accountRepository;
-    public AccountService(IAccountRepository _repo)
+    private readonly IAccountRepository _repo;
+    private readonly IPasswordHasher<Account> _hasher;
+    public AccountService(IAccountRepository repo, IPasswordHasher<Account> hasher)
     {
-        accountRepository = _repo;
+        _repo = repo;
+        _hasher = hasher;
     }
 
     public async Task<Book> AddBookToAccount(Book b, Account a)
     {
-        Account? user = await accountRepository.LookupAccount(a);
+        Account? user = await _repo.LookupAccount(a);
         if (user is null)
             throw new AccountNotFoundException("Account not found");
         if (user.Books.Count > BOOKLIMIT)
@@ -23,7 +28,7 @@ public class AccountService : IAccountService
 
     public async Task<ICollection<Book>> BooksInAccount(Account a)
     {
-        Account? user = await accountRepository.LookupAccount(a);
+        Account? user = await _repo.LookupAccount(a);
         if (user is null)
             throw new AccountNotFoundException("Account not found");
 
@@ -33,7 +38,7 @@ public class AccountService : IAccountService
     }
     public async Task<ICollection<Room>> RoomsInAccount(Account a)
     {
-        Account? user = await accountRepository.LookupAccount(a);
+        Account? user = await _repo.LookupAccount(a);
         if (user is null)
             throw new AccountNotFoundException("Account not found");
 
@@ -42,7 +47,7 @@ public class AccountService : IAccountService
     }
     public async Task<Room> AddRoomToAccount(Room b, Account a)
     {
-        Account? user = await accountRepository.LookupAccount(a);
+        Account? user = await _repo.LookupAccount(a);
         if (user is null)
             throw new AccountNotFoundException();
         if (a.Rooms.Count > ROOMLIMIT)
@@ -52,7 +57,7 @@ public class AccountService : IAccountService
     }
     public async Task<Book> ReturnBook(string isbn, Account a)
     {
-        Account? user = await accountRepository.LookupAccount(a);
+        Account? user = await _repo.LookupAccount(a);
 
         if (user is null)
             throw new AccountNotFoundException();
@@ -65,7 +70,7 @@ public class AccountService : IAccountService
     }
     public async Task<Room> CheckoutRoom(string roomID, Account a)
     {
-        Account? user = await accountRepository.LookupAccount(a);
+        Account? user = await _repo.LookupAccount(a);
 
         if (user is null)
             throw new AccountNotFoundException();
@@ -74,5 +79,59 @@ public class AccountService : IAccountService
             throw new BookNotFoundException();
         room.Bookedby = null;
         return room;
+    }
+
+    public async Task<Account> AddAccountToDB(string email, string password, string username)
+    {
+
+        if (!CheckEmail(email))
+            throw new InvalidEmailFormatException();
+        if (!CheckPassword(password))
+            throw new InvalidPasswordFormatException();
+        if (!CheckUser(username))
+            throw new InvalidUsernameFormatException();
+
+        if (await _repo.LookupAccount(email) is not null)
+            throw new AccountExistsException();
+
+        Account user = new Account
+        {
+            Email = email,
+            Username = username
+        };
+        var hashedPassword = _hasher.HashPassword(user, password);
+        user.Password = hashedPassword;
+        Account result = await _repo.AddAccount(user);
+
+        return result;
+    }
+
+
+    static bool CheckEmail(string? email)
+    {
+        if (email is not null)
+        {
+            return Regex.IsMatch(email, @"^[\w\.-]+@[\w\.-]+\.\w+$");
+        }
+        return false;
+    }
+
+    static bool CheckPassword(string? password)
+    {
+        if (password is not null)
+        {
+            return Regex.IsMatch(password, @"^\w{8,}$");
+        }
+        return false;
+    }
+
+    static bool CheckUser(String? user)
+    {
+        if (user is not null)
+        {
+            return Regex.IsMatch(user, @"^\w{3,}$");
+        }
+
+        return false;
     }
 }

@@ -4,14 +4,14 @@ using System.Xml.Xsl;
 [Serializable]
 public class AccountNotFoundException : Exception
 {
-    public AccountNotFoundException(): base("Account not found"){ }
+    public AccountNotFoundException() : base("Account not found") { }
     public AccountNotFoundException(string message) : base(message) { }
 };
 
 [Serializable]
 public class AccountExistsException : Exception
 {
-    public AccountExistsException(): base("Account already exists") { }
+    public AccountExistsException() : base("Account already exists") { }
     public AccountExistsException(string message) : base(message) { }
 }
 
@@ -24,7 +24,7 @@ public class InvalidAccountException : Exception
 [Serializable]
 public class BookNotFoundException : Exception
 {
-    public BookNotFoundException(): base("Book not found"){ }
+    public BookNotFoundException() : base("Book not found") { }
     public BookNotFoundException(string message) : base(message) { }
 };
 [Serializable]
@@ -50,7 +50,7 @@ public class BookLimitReachedException : Exception
 [Serializable]
 public class NotLoggedInException : Exception
 {
-    public NotLoggedInException(): base("You need to Log in") { }
+    public NotLoggedInException() : base("You need to Log in") { }
     public NotLoggedInException(string message) : base(message) { }
 };
 [Serializable]
@@ -67,7 +67,8 @@ public class BookBorrowedException : Exception
 }
 
 [Serializable]
-public class RoomBookedException : Exception{
+public class RoomBookedException : Exception
+{
     public RoomBookedException() : base("Room is currently booked") { }
     public RoomBookedException(string message) : base(message) { }
 }
@@ -82,8 +83,31 @@ public class RoomNotFoundException : Exception
 
 
 [Serializable]
-public class LoginException: Exception
+public class LoginException : Exception
 {
-    public  LoginException() { }
+    public LoginException() { }
     public LoginException(string message) : base(message) { }
+}
+
+
+[Serializable]
+public class InvalidEmailFormatException : Exception
+{
+    public InvalidEmailFormatException() : base("Invalid Email") { }
+    public InvalidEmailFormatException(string message) : base(message) { }
+
+}
+[Serializable]
+public class InvalidPasswordFormatException : Exception
+{
+    public InvalidPasswordFormatException() : base("Invalid Password") { }
+    public InvalidPasswordFormatException(string message) : base(message) { }
+
+}
+[Serializable]
+public class InvalidUsernameFormatException : Exception
+{
+    public InvalidUsernameFormatException() : base("Invalid Username") { }
+    public InvalidUsernameFormatException(string message) : base(message) { }
+
 }
