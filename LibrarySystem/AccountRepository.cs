@@ -29,8 +29,6 @@ public class AccountRepositry : IAccountRepository
 
     public async Task<Account> DeleteAccount(Account a)
     {
-        if (!(await _context.Accounts.AnyAsync(f => f.Id == a.Id)))
-            throw new AccountNotFoundException("Account not found");
         _context.Accounts.Remove(a);
         if (await _context.SaveChangesAsync() >= 1)
             return a;

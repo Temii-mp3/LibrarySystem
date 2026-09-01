@@ -23,20 +23,20 @@ builder.Services.AddCors(opts =>
 });
 
 //Jwt auth
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-    var cfg = builder.Configuration.GetSection("Jwt");
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidIssuer = cfg["Issuer"],
-        ValidateAudience = true,
-        ValidAudience = cfg["Audience"],
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(cfg["Secret"])),
-        ValidateLifetime = true
-    };
-});
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+//{
+//    var cfg = builder.Configuration.GetSection("Jwt");
+//    options.TokenValidationParameters = new TokenValidationParameters
+//    {
+//        ValidateIssuer = true,
+//        ValidIssuer = cfg["Issuer"],
+//        ValidateAudience = true,
+//        ValidAudience = cfg["Audience"],
+//        ValidateIssuerSigningKey = true,
+//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(cfg["Secret"])),
+//        ValidateLifetime = true
+//    };
+//});
 
 builder.Services.AddAuthorization();
 
@@ -48,21 +48,21 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Library API", Version = "v1" });
 
-    var jwtScheme = new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter 'Bearer {token}'"
-    };
-    c.AddSecurityDefinition("Bearer", jwtScheme);
+    //var jwtScheme = new OpenApiSecurityScheme
+    //{
+    //    Name = "Authorization",
+    //    Type = SecuritySchemeType.Http,
+    //    Scheme = "bearer",
+    //    BearerFormat = "JWT",
+    //    In = ParameterLocation.Header,
+    //    Description = "Enter 'Bearer {token}'"
+    //};
+    //c.AddSecurityDefinition("Bearer", jwtScheme);
 
-    c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-    {
-        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
-    });
+    //c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    //{
+    //    [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    //});
 });
 // in Program.cs before building the app or in startup
 var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Library.db");

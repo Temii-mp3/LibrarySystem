@@ -10,5 +10,8 @@ public interface IAccountService
     public Task<Book> ReturnBook(string isbn, Account a);
     public Task<Room> CheckoutRoom(string bookID, Account a);
 
+    public Task<Account> LookupAccount(string email);
+    public Task<Account> DeleteAccount(string email);
+
     public Task<Account> AddAccountToDB(string email, string password, string username);
 }

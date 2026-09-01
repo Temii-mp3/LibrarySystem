@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System;
+using System.Data;
 using System.Text.RegularExpressions;
 public class AccountService : IAccountService
 {
@@ -106,6 +107,29 @@ public class AccountService : IAccountService
         return result;
     }
 
+    public async Task<Account> LookupAccount(string email) {
+
+        if (!CheckEmail(email))
+            throw new InvalidEmailFormatException();
+        Account? result = await _repo.LookupAccount(email);
+
+        if (result is not null)
+            return result;
+        throw new AccountNotFoundException();
+    
+    }
+
+    public async Task<Account> DeleteAccount(string email)
+    {
+        Account? user = await _repo.LookupAccount(email);
+        if (user is null)
+            throw new AccountNotFoundException();
+        Account result = await _repo.DeleteAccount(user);
+        if (result is null)
+            throw new GenericException();
+        return result;
+
+    }
 
     static bool CheckEmail(string? email)
     {
