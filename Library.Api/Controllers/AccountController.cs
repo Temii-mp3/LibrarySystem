@@ -5,48 +5,43 @@ namespace Library.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AccountController : Controller
+    public class BookController : Controller
     {
         private readonly IAccountService _service;
 
 
-        public AccountController (IAccountService service, IAccountRepository repo)
+        public BookController (IAccountService service, IAccountRepository repo)
         {
             _service = service;
         }
 
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateAccount(CreateAccountRequest request)
+        [HttpPost("AddBookToLibrary")]
+        public async Task<IActionResult> AddBookToLbrary()
         {
-            Account user = await _service.AddAccountToDB(request.Email, request.Password, request.Username);
 
-            if (user is not null)
-            {
-                return Ok(user);
-            }
 
             return BadRequest();
         }
 
-        [HttpGet("lookup")]
-        public async Task<IActionResult> LookupAccount([FromQuery]LookupAccountRequest request)
+        [HttpGet("AddBookToAccount")]
+        public async Task<IActionResult> BorrowBook()
         {
-            Account user = await _service.LookupAccount(request.Email);
-            if(user is not null)
-            {
-                return Ok(user);
-            }
 
             return BadRequest();
         }
 
-        [HttpDelete("delete")]
-        public async Task<IActionResult> DeleteAccount(DeleteAccountRequst request)
+        [HttpDelete("RemoveBookFromAccount")]
+        public async Task<IActionResult> RemoveBookFromAccount()
         {
-            Account user = await _service.DeleteAccount(request.Email);
-            if (user is null)
-                return BadRequest();
-            return Ok(user);
+
+            return BadRequest();
+
+        }
+
+        [HttpDelete("DeleteBook")]
+        public async Task<IActionResult> DeleteBook()
+        {
+            return BadRequest();
         }
 
     }
