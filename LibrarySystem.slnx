@@ -1,6 +1,6 @@
 <Solution>
   <Project Path="Library.Api/Library.Api.csproj" Id="01751d47-78c3-4bc2-9aaa-3b5fffb6f9a6" />
   <Project Path="Library.Domain/Library.Domain.csproj" Id="6425464d-be8f-4d99-8c0b-7726056a832b" />
-  <Project Path="LibrarySystem/Library.Infrastructure.csproj" />
+  <Project Path="Library.Infrastructure/Library.Infrastructure.csproj" />
   <Project Path="LibrarySystemTests/LibrarySystemTests.csproj" Id="b1498d6b-25cb-477f-8629-a88ca93358c1" />
 </Solution>

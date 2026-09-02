@@ -1,3 +1,5 @@
+using Library.Infrastructure.Repositories;
+using Library.Infrastructure.Services;
 using LibraryDomain;
 using LibraryDomain.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -67,9 +69,17 @@ builder.Services.AddSwaggerGen(c =>
 // in Program.cs before building the app or in startup
 var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Library.db");
 Console.WriteLine($"DB path: {dbPath}, Exists: {System.IO.File.Exists(dbPath)}");
+
 builder.Services.AddScoped<IAccountRepository, AccountRepositry>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
+
 builder.Services.AddDbContext<LibraryDomain.Models.LibraryContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("LibraryDb") ?? "Data Source=Library.db"));
 

@@ -3,45 +3,50 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Api.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("[controller]")]
-    public class BookController : Controller
+    public class AccountController : ControllerBase
     {
         private readonly IAccountService _service;
 
 
-        public BookController (IAccountService service, IAccountRepository repo)
+        public AccountController(IAccountService service, IAccountRepository repo)
         {
             _service = service;
         }
 
-        [HttpPost("AddBookToLibrary")]
-        public async Task<IActionResult> AddBookToLbrary()
+        [HttpPost("Create")]
+        public async Task<IActionResult> CreateAccount(CreateAccountRequest request)
         {
+            Account user = await _service.AddAccountToDB(request.Email, request.Password, request.Username);
 
+            if (user is not null)
+            {
+                return Ok(user);
+            }
 
             return BadRequest();
         }
 
-        [HttpGet("AddBookToAccount")]
-        public async Task<IActionResult> BorrowBook()
+        [HttpGet("Lookup")]
+        public async Task<IActionResult> LookupAccount([FromQuery] LookupAccountRequest request)
         {
+            Account user = await _service.LookupAccount(request.Email);
+            if (user is not null)
+            {
+                return Ok(user);
+            }
 
             return BadRequest();
         }
 
-        [HttpDelete("RemoveBookFromAccount")]
-        public async Task<IActionResult> RemoveBookFromAccount()
+        [HttpDelete("Delete")]
+        public async Task<IActionResult> DeleteAccount(DeleteAccountRequst request)
         {
-
-            return BadRequest();
-
-        }
-
-        [HttpDelete("DeleteBook")]
-        public async Task<IActionResult> DeleteBook()
-        {
-            return BadRequest();
+            Account user = await _service.DeleteAccount(request.Email);
+            if (user is null)
+                return BadRequest();
+            return Ok(user);
         }
 
     }

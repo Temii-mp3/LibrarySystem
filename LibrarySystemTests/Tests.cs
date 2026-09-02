@@ -1,5 +1,7 @@
 ﻿
 
+using Library.Infrastructure.Repositories;
+using Library.Infrastructure.Services;
 using LibraryDomain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +15,9 @@ namespace LibrarySystemTests
         Account? account;
         Book? book;
         Room? room;
-        AccountRepositry _repo;
+        BookService _service;
+        BookRepository book_repo;
+        AccountRepositry account_repo;
 
         [TestInitialize]
         public void setup()
@@ -34,7 +38,9 @@ namespace LibrarySystemTests
 
             var options = new DbContextOptionsBuilder<LibraryContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
             context = new(options);
-            _repo = new(context);
+            book_repo = new(context);
+            account_repo = new(context);
+            _service = new(book_repo, account_repo);
         }
 
         [TestCleanup]
@@ -60,7 +66,7 @@ namespace LibrarySystemTests
 
             Account userAccount = context.Accounts.FirstOrDefault(a => a.Id == account.Id);
 
-            var result = await _repo.AddBookToAccount(userAccount, book);
+            var result = await _service.AddBookToAccount(book, userAccount);
 
             Assert.AreSame(result, book);             
 

@@ -3,51 +3,46 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Api.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("[controller]")]
-    public class AccountController : Controller
+    public class BookController : ControllerBase
     {
-        private readonly IAccountService _service;
+        private readonly IBookService _service;
 
 
-        public AccountController(IAccountService service, IAccountRepository repo)
+        public BookController(IBookService service)
         {
             _service = service;
         }
 
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateAccount(CreateAccountRequest request)
+        [HttpPost("AddBookToLibrary")]
+        public async Task<IActionResult> AddBookToLbrary(CreateBookRequest request)
         {
-            Account user = await _service.AddAccountToDB(request.Email, request.Password, request.Username);
+            _service.
+        }
 
-            if (user is not null)
-            {
-                return Ok(user);
-            }
+        [HttpGet("AddBookToAccount")]
+        public async Task<IActionResult> BorrowBook()
+        {
 
             return BadRequest();
         }
 
-        [HttpGet("lookup")]
-        public async Task<IActionResult> LookupAccount([FromQuery] LookupAccountRequest request)
+        [HttpDelete("RemoveBookFromAccount")]
+        public async Task<IActionResult> RemoveBookFromAccount()
         {
-            Account user = await _service.LookupAccount(request.Email);
-            if (user is not null)
-            {
-                return Ok(user);
-            }
 
             return BadRequest();
+
         }
 
-        [HttpDelete("delete")]
-        public async Task<IActionResult> DeleteAccount(DeleteAccountRequst request)
+        [HttpDelete("DeleteBook")]
+        public async Task<IActionResult> DeleteBook()
         {
-            Account user = await _service.DeleteAccount(request.Email);
-            if (user is null)
-                return BadRequest();
-            return Ok(user);
+            return BadRequest();
         }
 
     }
 }
+
+
