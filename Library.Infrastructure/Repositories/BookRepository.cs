@@ -63,7 +63,17 @@ namespace Library.Infrastructure.Repositories
 
         public async Task<Book> AddBookToDB(Book b)
         {
-            if(await _context.Books.AddAsync(b))
+            try
+            {
+                await _context.Books.AddAsync(b);
+                if (await _context.SaveChangesAsync() >= 1)
+                    return b;
+            }
+            catch (DbUpdateException)
+            {
+                throw new GenericException("Something went wrong");
+            }
+            throw new GenericException("Something went wrong");
         }
 
     }

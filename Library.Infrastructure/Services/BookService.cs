@@ -64,11 +64,17 @@ namespace Library.Infrastructure.Services
                 Name = name
             };
 
-            Book result = book_repo.AddBookToDB(book);
+            Book result = await book_repo.AddBookToDB(book);
 
             if (result is null)
                 throw new GenericException();
             return result;
+        }
+
+        public async Task<ICollection<Book>> GetAllBooks()
+        {
+
+            List < Book > books = await book_repo.GetAllBooks();
         }
     }
 }

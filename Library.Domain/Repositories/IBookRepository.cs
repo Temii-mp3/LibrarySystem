@@ -2,13 +2,14 @@
 
 public interface IBookRepository
 {
-    public void PrintBooks();
-    public Task<Book> AddBookToAccount(int id, Book b);
-    public Task<List<Book>> BooksInAccount(Account a);
-    public Task<Book> GetBookfromDb(string isbn);
-    public void PrintBorrowedBooks(Account user);
-    public Task<Book> ReturnBook(Book b);
-    public Task<Book> AddBookToDB(Book b);
+    void PrintBooks();
+    Task<Book> AddBookToAccount(int id, Book b);
+    Task<List<Book>> BooksInAccount(Account a);
+    Task<Book> GetBookfromDb(string isbn);
+    void PrintBorrowedBooks(Account user);
+    Task<Book> ReturnBook(Book b);
+    Task<Book> AddBookToDB(Book b);
+    Task<ICollection<Book>> GetAllBooks();
 
 
 }

@@ -1,4 +1,5 @@
-﻿using LibraryDomain.Models;
+﻿using Library.Infrastructure.Services;
+using LibraryDomain.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Api.Controllers
@@ -18,7 +19,12 @@ namespace Library.Api.Controllers
         [HttpPost("AddBookToLibrary")]
         public async Task<IActionResult> AddBookToLbrary(CreateBookRequest request)
         {
-            _service.
+
+            Book book = await _service.AddBookToLibrary(request.Isbn, request.Author, request.Name);
+
+            if (book is null)
+                return BadRequest();
+            return Ok(book);
         }
 
         [HttpGet("AddBookToAccount")]
@@ -40,6 +46,12 @@ namespace Library.Api.Controllers
         public async Task<IActionResult> DeleteBook()
         {
             return BadRequest();
+        }
+
+        [HttpGet("GetAllBooks")]
+        public async Task<IActionResult> GetAllBooks()
+        {
+            List<Book> books = _service.GetAllBooks();
         }
 
     }
