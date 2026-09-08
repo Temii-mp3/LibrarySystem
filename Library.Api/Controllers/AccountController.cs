@@ -16,7 +16,7 @@ namespace Library.Api.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<IActionResult> CreateAccount(CreateAccountRequest request)
+        public async Task<IActionResult> CreateAccount(DTO request)
         {
             Account user = await _service.AddAccountToDB(request.Email, request.Password, request.Username);
 

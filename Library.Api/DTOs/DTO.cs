@@ -10,3 +10,5 @@ public record BookDTO(string Isbn);
 public record AccountDTO(string email);
 
 public record BookReturnDTO(string? isbn, string? name, string? author);
+
+public record CreateRoomRequest(string type);

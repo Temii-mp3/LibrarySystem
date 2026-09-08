@@ -1,6 +1,7 @@
 ﻿using LibraryDomain.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -58,6 +59,33 @@ namespace Library.Infrastructure.Repositories
             {
                 Console.WriteLine(item);
             }
+        }
+
+        public async Task<Room> AddRoomToLibrary(Room r)
+        {
+
+            await _context.Rooms.AddAsync(r);
+
+            if (await _context.SaveChangesAsync() >= 1)
+                return r;
+            throw new GenericException();
+        }
+
+        public async Task<ICollection<Room>> GetAllRooms()
+        {
+            ICollection<Room> result = await _context.Rooms.ToListAsync();
+
+            if (result is not null)
+                return result;
+            throw new GenericException();
+        }
+
+        public async Task<ICollection<Room>> GetBorrowedRooms(Account a)
+        {
+            ICollection<Room> result = a.Rooms;
+            if (result is not null)
+                return result;
+            throw new GenericException();
         }
     }
 }

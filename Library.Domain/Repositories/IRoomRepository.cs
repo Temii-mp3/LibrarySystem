@@ -7,6 +7,7 @@ public interface IRoomRepository
     public Task<Room> AddRoomToAccount(int id, Room r);
     public Task<Room> GetRoomFromDb(string id);
     public Task<Room> CheckoutRoom( Room room);
-
-
+    public Task<Room> AddRoomToLibrary(Room r);
+    public Task<ICollection<Room>> GetAllRooms();
+    public Task<List<Room>> GetBorrowedRooms(Account a);
 }

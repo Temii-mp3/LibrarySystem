@@ -1,5 +1,9 @@
-﻿using LibraryDomain.Models;
+﻿using Library.Infrastructure.Services;
+using LibraryDomain.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Operations;
+using System.ComponentModel.Design;
+using System.Data;
 
 namespace Library.Api.Controllers
 {
@@ -16,32 +20,59 @@ namespace Library.Api.Controllers
         }
 
         [HttpPost("AddRoomToLibrary")]
-        public async Task<IActionResult> AddRoomToLbrary()
+        public async Task<IActionResult> AddRoomToLbrary(CreateRoomRequest request)
         {
 
+            Room room = await _service.AddRoomToLibrary(request.type);
 
-            return BadRequest();
+            if (room is null)
+                return BadRequest();
+            return Ok(room);
         }
 
-        [HttpGet("AddRoomToAccount")]
-        public async Task<IActionResult> BorrowRoom()
+        [HttpPost("AddRoomToAccount")]
+        public async Task<IActionResult> CheckoutRoom(CheckoutRoomRrequest req)
         {
-
+            Room result = await _service.AddRoomToAccount(req.isbn, req.email);
+            if (result is not null)
+            {
+                var Roomdto = new RoomReturnDTO(result.Isbn, result.Name, result.Author);
+                return Ok(Roomdto);
+            }
             return BadRequest();
+
         }
 
-        [HttpDelete("RemoveRoomFromAccount")]
-        public async Task<IActionResult> RemoveRoomFromAccount()
+        [HttpPost("RemoveRoomFromAccount")]
+        public async Task<IActionResult> RemoveRoomFromAccount(RoomDTO Room)
         {
 
+            Room result = await _service.ReturnRoom(Room.Isbn);
+            if (result is not null)
+                return Ok(result);
+
             return BadRequest();
+
 
         }
 
         [HttpDelete("DeleteRoom")]
-        public async Task<IActionResult> DeleteRoom()
+        public async Task<IActionResult> DeleteRoom(RoomDTO _Room)
         {
+            Room result = await _service.DeleteRoom(_Room.Isbn);
+            if (result is not null)
+                return Ok(result);
             return BadRequest();
+        }
+
+        [HttpGet("GetAllRooms")]
+        public async Task<IActionResult> GetAllRooms()
+        {
+            ICollection<Room> Rooms = await _service.GetAllRooms();
+
+            if (Rooms is null)
+                return BadRequest();
+            return Ok(Rooms);
         }
 
     }

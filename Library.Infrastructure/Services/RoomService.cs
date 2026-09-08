@@ -1,13 +1,17 @@
 ﻿using LibraryDomain.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Text;
+using System.Xml.XPath;
 
 namespace Library.Infrastructure.Services
 {
     public class RoomService : IRoomService
     {
+        List<string> roomTypes = new List<string> { "conference", "study" };
         const int ROOMLIMIT = 1;
         IRoomRepository room_repo;
         IAccountRepository account_repo;
@@ -48,6 +52,36 @@ namespace Library.Infrastructure.Services
                 throw new BookNotFoundException();
             room.Bookedby = null;
             return room;
+        }
+
+        public async Task<Room> AddRoomToLibrary(string type)
+        {
+            if (!roomTypes.Contains(type.ToLower()))
+                throw new GenericException();
+
+            Room room = new Room
+            {
+                Type = type
+            };
+
+            Room result = await room_repo.AddRoomToLibrary(room);
+            if (result is not null)
+                return result;
+            throw new GenericException();
+
+        }
+
+        public async Task<ICollection<Room>> GetAllRooms()
+        {
+            ICollection<Room> rooms = room_repo.GetAllRooms();
+            if (rooms is null)
+                throw new GenericException();
+            return rooms;
+        }
+
+        public async Task<ICollection<Room>> GetBorrowedRooms()
+        {
+            return null;
         }
     }
 }
