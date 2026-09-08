@@ -1,6 +1,8 @@
 ﻿using Library.Infrastructure.Services;
 using LibraryDomain.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Operations;
+using System.Data;
 
 namespace Library.Api.Controllers
 {
@@ -27,34 +29,52 @@ namespace Library.Api.Controllers
             return Ok(book);
         }
 
-        [HttpGet("AddBookToAccount")]
-        public async Task<IActionResult> BorrowBook()
+        [HttpPost("AddBookToAccount")]
+        public async Task<IActionResult> BorrowBook(BorrowBookRequest req)
         {
-
+            Book result = await _service.AddBookToAccount(req.isbn, req.email);
+            if (result is not null)
+            {
+                var bookdto = new BookReturnDTO(result.Isbn, result.Name, result.Author);
+                return Ok(bookdto);
+            }
             return BadRequest();
+            
         }
 
-        [HttpDelete("RemoveBookFromAccount")]
-        public async Task<IActionResult> RemoveBookFromAccount()
+        [HttpPost("RemoveBookFromAccount")]
+        public async Task<IActionResult> RemoveBookFromAccount(BookDTO book)
         {
 
+            Book result = await _service.ReturnBook(book.Isbn);
+            if (result is not null)
+                return Ok(result);
+
             return BadRequest();
+          
 
         }
 
         [HttpDelete("DeleteBook")]
-        public async Task<IActionResult> DeleteBook()
+        public async Task<IActionResult> DeleteBook(BookDTO _book)
         {
+            Book result = await _service.DeleteBook(_book.Isbn);
+            if (result is not null)
+                return Ok(result);
             return BadRequest();
         }
 
         [HttpGet("GetAllBooks")]
         public async Task<IActionResult> GetAllBooks()
         {
-            List<Book> books = _service.GetAllBooks();
+            ICollection<Book> books = await _service.GetAllBooks();
+
+            if (books is null)
+                return BadRequest();
+            return Ok(books);
         }
 
-    }
+    } 
 }
 
 

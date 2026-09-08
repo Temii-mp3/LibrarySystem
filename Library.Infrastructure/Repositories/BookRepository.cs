@@ -16,9 +16,10 @@ namespace Library.Infrastructure.Repositories
         }
 
 
-        public async Task<Book> AddBookToAccount(int id, Book b)
-        {
+        public async Task<Book> AddBookToAccount(Book b, int id)
+        { 
             b.BorrowedBy = id;
+
             if (await _context.SaveChangesAsync() >= 1)
                 return b;
             throw new GenericException();
@@ -52,6 +53,13 @@ namespace Library.Infrastructure.Repositories
             return book;
         }
 
+        public async Task<ICollection<Book>> GetAllBooks()
+        {
+            ICollection<Book> books = await _context.Books.ToListAsync();
+            if (books is not null)
+                return books;
+            throw new GenericException();
+        }
 
         public void PrintBorrowedBooks(Account user)
         {
@@ -74,6 +82,15 @@ namespace Library.Infrastructure.Repositories
                 throw new GenericException("Something went wrong");
             }
             throw new GenericException("Something went wrong");
+        }
+
+        public async Task<Book> DeleteBook(Book b)
+        {
+             _context.Books.Remove(b);
+            if (await _context.SaveChangesAsync() >= 1)
+                return b;
+            throw new GenericException();
+
         }
 
     }

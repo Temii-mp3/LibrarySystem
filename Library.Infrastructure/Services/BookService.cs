@@ -18,18 +18,16 @@ namespace Library.Infrastructure.Services
             book_repo = _book_repo;
             account_repo = _account_repo;
         }
-        public async Task<Book> ReturnBook(string isbn, Account a)
+        public async Task<Book> ReturnBook(string isbn)
         {
-            Account? user = await account_repo.LookupAccount(a);
-
-            if (user is null)
-                throw new AccountNotFoundException();
-            Book? book = user.Books.FirstOrDefault(b => b.Isbn == isbn);
+            Book? book = await book_repo.GetBookfromDb(isbn);
             if (book is null)
                 throw new BookNotFoundException();
-            book.BorrowedBy = null;
-            return book;
 
+            Book result = await book_repo.ReturnBook(book);
+            if (result is not null)
+                return book;
+            throw new GenericException();
         }
 
         public async Task<ICollection<Book>> BooksInAccount(Account a)
@@ -42,15 +40,18 @@ namespace Library.Infrastructure.Services
 
 
         }
-        public async Task<Book> AddBookToAccount(Book b, Account a)
+        public async Task<Book> AddBookToAccount(string isbn, string email)
         {
-            Account? user = await account_repo.LookupAccount(a);
-            if (user is null)
-                throw new AccountNotFoundException("Account not found");
-            if (user.Books.Count > BOOKLIMIT)
-                throw new BookLimitReachedException($"Book Limit of {BOOKLIMIT} has been reached");
-            b.BorrowedBy = user.Id;
-            return b;
+            Book? book = await book_repo.GetBookfromDb(isbn);
+            if (book is null)
+                throw new BookNotFoundException();
+            Account? account = await account_repo.LookupAccount(email);
+            if (account is null)
+                throw new AccountNotFoundException();
+            Book result = await book_repo.AddBookToAccount(book, account.Id);
+            if (result is not null)
+                return result;
+            throw new GenericException();
         }
 
         public async Task<Book> AddBookToLibrary(string isbn, string author, string name)
@@ -74,7 +75,20 @@ namespace Library.Infrastructure.Services
         public async Task<ICollection<Book>> GetAllBooks()
         {
 
-            List < Book > books = await book_repo.GetAllBooks();
+            ICollection<Book> books = await book_repo.GetAllBooks();
+            return books;
+        }
+
+        public async Task<Book> DeleteBook(string isbn)
+        {
+            Book book = await book_repo.GetBookfromDb(isbn);
+            if (book is null)
+                throw new BookNotFoundException();
+            Book result = await book_repo.DeleteBook(book);
+            if (result is null)
+                throw new GenericException();
+            return result;
+
         }
     }
 }
