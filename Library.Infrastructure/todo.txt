@@ -43,4 +43,43 @@ Actionable checklist (short, ordered)
 •	Convert core business logic to a class library, then create a minimal ASP.NET Core Web API that exposes account/book endpoints (GET/POST) — this is the bridge to your next roadmap step.
 Two short code examples you can apply now
 C# LibrarySystem/Account.cs — use properties (refactor)
+
+
+Checklist items with status, evidence, and next step
+1.	Refactor style & small fixes
+•	Status: Partial
+•	Evidence: Domain models use auto-properties (Library.Domain.Models.Account). But code style issues remain: AccountRepositry class name misspelled, repository field is not readonly/private, some public APIs and naming use inconsistent casing/underscores (controllers use dto._Room/_User).
+•	Next step: rename to AccountRepository, make fields private readonly, fix DTO/property PascalCase and remove leading underscores.
+2.	Replace static manager with interface + implementation
+•	Status: Done
+•	Evidence: IAccountRepository + AccountRepositry exist and are registered with DI in Library.Api/Program.cs.
+3.	Add unit tests
+•	Status: Not done (partial)
+•	Evidence: LibrarySystemTests/Tests.cs exists but all tests are commented out.
+•	Next step: uncomment/finish tests, add xUnit or MSTest assertions, wire an in-memory EF provider for CI.
+4.	Persist data (EF Core + migrations)
+•	Status: Partial
+•	Evidence: Migrations present (Library.Infrastructure/Migrations/InitialCreate.cs) and Library.db files exist under Library.Api and Library.Infrastructure. Program.cs configures DbContext (connection string).
+•	Gap: migrations are not applied programmatically at startup; runtime exception (no such table: Account) indicates the DB file the API uses does not have the schema applied.
+•	Next step: apply migrations to the runtime DB (dotnet ef database update) or call Database.Migrate() at startup.
+Example (add to Program.cs before app.Run()):
+5.	Learn LINQ + async
+•	Status: Done
+•	Evidence: Repositories use async EF methods and LINQ (FirstOrDefaultAsync, AnyAsync, ToListAsync).
+6.	Secure credentials
+•	Status: Done
+•	Evidence: IPasswordHasher<Account> is used in AccountService to hash passwords.
+7.	Small integration project (API)
+•	Status: Done
+•	Evidence: Library.Api project with controllers, DI, JWT auth, Swagger, and controllers for Account/Book/Room.
+Immediate actions I recommend (priority)
+1.	Ensure DB schema is applied to the DB file used by the API:
+•	Run dotnet ef database update against Library.Api project, or add Database.Migrate() in Program.cs.
+•	Confirm the connection string points to the intended Library.Api\Library.db (appsettings.json does).
+2.	Fix naming/style issues (AccountRepositry → AccountRepository, make _context private readonly, DTO property naming).
+3.	Restore/complete unit tests and add CI job.
+4.	Replace DTO/body usage with conventional names and route parameters where appropriate (DELETE /api/rooms/{id}).
+If you want, I can:
+•	Add the Database.Migrate() snippet into Program.cs and fix the obvious naming issues in the repo.
+
  	

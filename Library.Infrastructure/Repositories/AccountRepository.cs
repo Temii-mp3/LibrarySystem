@@ -74,6 +74,11 @@ public class AccountRepositry : IAccountRepository
         throw new GenericException("Cannot Update Account");
     }
 
+    public async Task<ICollection<Account>> GetAllAccounts()
+    {
+        return await _context.Accounts.ToListAsync(); 
+    }
+
 
 
 

@@ -17,27 +17,36 @@ namespace Library.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<List<Room>> RoomsInAccount(Account a)
+        public async Task<List<Room>?> RoomsInAccount(Account a)
         {
             List<Room> rooms = a.Rooms.ToList();
             return rooms;
         }
-        public async Task<Room> AddRoomToAccount(int id, Room r)
+        public async Task<Room?> AddRoomToAccount(int id, Room r)
         {
             r.Bookedby = id;
             if (await _context.SaveChangesAsync() >= 1)
                 return r;
-            throw new GenericException();
+            return null;
         }
 
 
-        public async Task<Room> CheckoutRoom(Room room)
+        public async Task<Room?> RemoveRoomFromAccount(Room room)
         {
             room.Bookedby = null;
 
             if (await _context.SaveChangesAsync() >= 1)
                 return room;
-            throw new GenericException();
+            return null;
+        }
+
+        public async Task<Room?> RemoveRoomFromLibrary(Room room)
+        {
+            _context.Rooms.Remove(room);
+
+            if (await _context.SaveChangesAsync() >= 1)
+                return room;
+            return null;
         }
 
         public void PrintRooms()
@@ -45,7 +54,7 @@ namespace Library.Infrastructure.Repositories
             _context.Rooms.ForEachAsync(Console.WriteLine);
         }
 
-        public async Task<Room> GetRoomFromDb(string id)
+        public async Task<Room?> GetRoomFromDb(string id)
         {
             Room? room = await _context.Rooms.FirstOrDefaultAsync(b => b.Id == id);
             if (room is null)
@@ -61,31 +70,31 @@ namespace Library.Infrastructure.Repositories
             }
         }
 
-        public async Task<Room> AddRoomToLibrary(Room r)
+        public async Task<Room?> AddRoomToLibrary(Room r)
         {
 
             await _context.Rooms.AddAsync(r);
 
             if (await _context.SaveChangesAsync() >= 1)
                 return r;
-            throw new GenericException();
+            return null;
         }
 
-        public async Task<ICollection<Room>> GetAllRooms()
+        public async Task<ICollection<Room>?> GetAllRooms()
         {
             ICollection<Room> result = await _context.Rooms.ToListAsync();
 
             if (result is not null)
                 return result;
-            throw new GenericException();
+            return null;
         }
 
-        public async Task<ICollection<Room>> GetBorrowedRooms(Account a)
+        public async Task<ICollection<Room>?> GetBorrowedRooms(Account a)
         {
             ICollection<Room> result = a.Rooms;
             if (result is not null)
                 return result;
-            throw new GenericException();
+            return null;
         }
     }
 }

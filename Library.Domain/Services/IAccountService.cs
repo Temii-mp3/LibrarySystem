@@ -7,4 +7,6 @@ public interface IAccountService
     public Task<Account> DeleteAccount(string email);
 
     public Task<Account> AddAccountToDB(string email, string password, string username);
+
+    public Task<ICollection<Account>> GetAllAccounts();
 }

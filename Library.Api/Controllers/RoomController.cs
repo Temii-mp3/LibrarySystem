@@ -31,35 +31,31 @@ namespace Library.Api.Controllers
         }
 
         [HttpPost("AddRoomToAccount")]
-        public async Task<IActionResult> CheckoutRoom(CheckoutRoomRrequest req)
+        public async Task<IActionResult> AddRoomToAccount(RoomUserDTO dto)
         {
-            Room result = await _service.AddRoomToAccount(req.isbn, req.email);
+            Room result = await _service.AddRoomToAccount(dto.Room.id, dto.User.email);
             if (result is not null)
             {
-                var Roomdto = new RoomReturnDTO(result.Isbn, result.Name, result.Author);
-                return Ok(Roomdto);
+                return Ok(result);
             }
             return BadRequest();
 
         }
 
         [HttpPost("RemoveRoomFromAccount")]
-        public async Task<IActionResult> RemoveRoomFromAccount(RoomDTO Room)
+        public async Task<IActionResult> RemoveRoomFromAccount(RoomUserDTO dto)
         {
-
-            Room result = await _service.ReturnRoom(Room.Isbn);
+            Room result = await _service.RemoveRoomFromAccount(dto.Room.id, dto.User.email);
             if (result is not null)
                 return Ok(result);
 
             return BadRequest();
-
-
         }
 
         [HttpDelete("DeleteRoom")]
         public async Task<IActionResult> DeleteRoom(RoomDTO _Room)
         {
-            Room result = await _service.DeleteRoom(_Room.Isbn);
+            Room result = await _service.RemoveRoomFromLibrary(_Room.id);
             if (result is not null)
                 return Ok(result);
             return BadRequest();
@@ -69,6 +65,16 @@ namespace Library.Api.Controllers
         public async Task<IActionResult> GetAllRooms()
         {
             ICollection<Room> Rooms = await _service.GetAllRooms();
+
+            if (Rooms is null)
+                return BadRequest();
+            return Ok(Rooms);
+        }
+
+        [HttpGet("GetBookedRoomsInAccount")]
+        public async Task<IActionResult> GetBookedRoomsInAccount([FromQuery]AccountDTO user)
+        {
+            ICollection<Room> Rooms = await _service.GetBorrowedRooms(user.email);
 
             if (Rooms is null)
                 return BadRequest();

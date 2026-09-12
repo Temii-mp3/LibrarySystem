@@ -3,10 +3,11 @@ using System;
 
 public interface IRoomService
 {
-    public Task<ICollection<Room>> RoomsInAccount(Account a);
-    public Task<Room> AddRoomToAccount(Room b, Account a);
-    public Task<Room> CheckoutRoom(string bookID, Account a);
+    public Task<ICollection<Room>> RoomsInAccount(string email);
+    public Task<Room> AddRoomToAccount(string roomID, string email);
+    public Task<Room> RemoveRoomFromAccount(string roomID, string email);
     public Task<Room> AddRoomToLibrary(string type);
-    public ICollection<Room> GetAllRooms();
-    public ICollection<Room> GetCheckedOutRooms(int id);
+    public Task<Room> RemoveRoomFromLibrary(string id);
+    public Task<ICollection<Room>> GetAllRooms();
+    public Task<ICollection<Room>> GetBorrowedRooms(string email);
 }

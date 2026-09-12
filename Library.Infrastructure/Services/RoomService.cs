@@ -21,37 +21,59 @@ namespace Library.Infrastructure.Services
             account_repo = accountRepo;
         }
 
-        public async Task<ICollection<Room>> RoomsInAccount(Account a)
+        public async Task<ICollection<Room>> RoomsInAccount(string email)
         {
-            Account? user = await account_repo.LookupAccount(a);
+            Account? user = await account_repo.LookupAccount(email);
             if (user is null)
                 throw new AccountNotFoundException("Account not found");
 
-            return await room_repo.RoomsInAccount(user);
+            ICollection<Room>? roomsInAcc = await room_repo.RoomsInAccount(user);
+            if (roomsInAcc is null)
+                throw new GenericException();
+
+            return roomsInAcc;
 
         }
-        public async Task<Room> AddRoomToAccount(Room b, Account a)
+        public async Task<Room> AddRoomToAccount(string roomID, string email)
         {
-            Account? user = await account_repo.LookupAccount(a);
-            if (user is null)
-                throw new AccountNotFoundException();
-            if (a.Rooms.Count > ROOMLIMIT)
-                throw new RoomLimitReachedException("Room Limit of {LIMIT} has been reached");
-            b.Bookedby = user.Id;
-            return b;
-        }
+            Room? room = await room_repo.GetRoomFromDb(roomID);
+            Account user = await account_repo.LookupAccount(email);
 
-        public async Task<Room> CheckoutRoom(string roomID, Account a)
-        {
-            Account? user = await account_repo.LookupAccount(a);
+            if (user.Rooms.Count > ROOMLIMIT)
+                throw new BookLimitReachedException("Room Limit of {LIMIT} has been reached");
 
-            if (user is null)
-                throw new AccountNotFoundException();
-            Room? room = user.Rooms.FirstOrDefault(b => b.Id == roomID);
             if (room is null)
-                throw new BookNotFoundException();
-            room.Bookedby = null;
-            return room;
+                throw new RoomNotFoundException();
+            if (user is null)
+                throw new NotLoggedInException();
+
+            Room? result = await room_repo.AddRoomToAccount(user.Id, room);
+
+            if (result is null)
+                throw new GenericException();
+            return result;
+        }
+
+        public async Task<Room> RemoveRoomFromAccount(string roomID, string email)
+        {
+            Room? room = await room_repo.GetRoomFromDb(roomID);
+            Account user = await account_repo.LookupAccount(email);
+
+            if (room is null)
+                throw new RoomNotFoundException();
+            if (user is null)
+                throw new AccountNotFoundException();
+
+            ICollection<Room>? borrowedRooms = await room_repo.GetBorrowedRooms(user);
+            if (borrowedRooms is null)
+                throw new GenericException();
+            if(!borrowedRooms.Contains(room))
+                throw new GenericException("Room not in account");
+
+            Room? result = await room_repo.RemoveRoomFromAccount(room);
+            if (result is null)
+                throw new GenericException();
+            return result;
         }
 
         public async Task<Room> AddRoomToLibrary(string type)
@@ -61,27 +83,47 @@ namespace Library.Infrastructure.Services
 
             Room room = new Room
             {
-                Type = type
+                Type = type,
+                Bookedby = null,
+                BookedbyNavigation = null
             };
 
-            Room result = await room_repo.AddRoomToLibrary(room);
+            Room? result = await room_repo.AddRoomToLibrary(room);
             if (result is not null)
                 return result;
             throw new GenericException();
 
         }
 
+        public async Task<Room> RemoveRoomFromLibrary(string roomID)
+        {
+            Room? room = await room_repo.GetRoomFromDb(roomID);
+            if (room is null)
+                throw new GenericException();
+            Room? result = await room_repo.RemoveRoomFromLibrary(room);
+
+            if (result is null)
+                throw new GenericException();
+            return result;
+        }
+
         public async Task<ICollection<Room>> GetAllRooms()
         {
-            ICollection<Room> rooms = room_repo.GetAllRooms();
+            ICollection<Room>? rooms = await room_repo.GetAllRooms();
             if (rooms is null)
                 throw new GenericException();
             return rooms;
         }
 
-        public async Task<ICollection<Room>> GetBorrowedRooms()
+        public async Task<ICollection<Room>> GetBorrowedRooms(string email)
         {
-            return null;
+            Account user = await account_repo.LookupAccount(email);
+            if (user is null)
+                throw new AccountNotFoundException();
+            ICollection<Room>? borrowedRooms = await room_repo.GetBorrowedRooms(user);
+            if (borrowedRooms is null)
+                throw new GenericException();
+            return borrowedRooms;
         }
     }
 }

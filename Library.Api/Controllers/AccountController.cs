@@ -16,7 +16,7 @@ namespace Library.Api.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<IActionResult> CreateAccount(DTO request)
+        public async Task<IActionResult> CreateAccount(CreateAccountRequest request)
         {
             Account user = await _service.AddAccountToDB(request.Email, request.Password, request.Username);
 
@@ -47,6 +47,15 @@ namespace Library.Api.Controllers
             if (user is null)
                 return BadRequest();
             return Ok(user);
+        }
+
+        [HttpGet("GetAllAccounts")]
+        public async Task<IActionResult> GetAllAccounts()
+        {
+            ICollection<Account> accounts = await _service.GetAllAccounts();
+            if (accounts is null)
+                return BadRequest();
+            return Ok(accounts);
         }
 
     }

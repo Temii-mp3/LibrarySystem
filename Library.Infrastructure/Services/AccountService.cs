@@ -91,4 +91,12 @@ public class AccountService : IAccountService
 
         return false;
     }
+    public async Task<ICollection<Account>> GetAllAccounts()
+    {
+
+        ICollection<Account> accounts = await _repo.GetAllAccounts();
+        if (accounts is null)
+            throw new GenericException();
+        return accounts;
+    }
 }
