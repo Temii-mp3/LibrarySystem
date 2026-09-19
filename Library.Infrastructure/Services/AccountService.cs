@@ -17,12 +17,8 @@ public class AccountService : IAccountService
     public async Task<Account> AddAccountToDB(string email, string password, string username)
     {
 
-        if (!CheckEmail(email))
-            throw new InvalidEmailFormatException();
-        if (!CheckPassword(password))
-            throw new InvalidPasswordFormatException();
-        if (!CheckUser(username))
-            throw new InvalidUsernameFormatException();
+        if (!CheckEmail(email) || !CheckPassword(password) || !CheckUser(username))
+            throw new LoginException();
 
         if (await _repo.LookupAccount(email) is not null)
             throw new AccountExistsException();
@@ -43,7 +39,7 @@ public class AccountService : IAccountService
     {
 
         if (!CheckEmail(email))
-            throw new InvalidEmailFormatException();
+            throw new LoginException();
         Account? result = await _repo.LookupAccount(email);
 
         if (result is not null)

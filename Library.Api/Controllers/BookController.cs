@@ -42,17 +42,15 @@ namespace Library.Api.Controllers
             
         }
 
-        [HttpPost("RemoveBookFromAccount")]
-        public async Task<IActionResult> RemoveBookFromAccount(BookDTO book)
+        [HttpPost("RemoveFromAccount/{isbn}")]
+        public async Task<IActionResult> RemoveBookFromAccount([FromRoute]string isbn)
         {
 
-            Book result = await _service.ReturnBook(book.Isbn);
+            Book result = await _service.ReturnBook(isbn);
             if (result is not null)
                 return Ok(result);
 
             return BadRequest();
-          
-
         }
 
         [HttpDelete("DeleteBook")]

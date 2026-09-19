@@ -1,3 +1,4 @@
+using Library.Api;
 using Library.Infrastructure.Repositories;
 using Library.Infrastructure.Services;
 using LibraryDomain;
@@ -42,7 +43,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ExceptionFilter>();
+});
 
 builder.Services.AddEndpointsApiExplorer();
 
