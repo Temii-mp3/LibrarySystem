@@ -16,12 +16,6 @@ public class AccountExistsException : Exception
 }
 
 [Serializable]
-public class InvalidAccountException : Exception
-{
-    public InvalidAccountException() { }
-    public InvalidAccountException(string message) : base(message) { }
-};
-[Serializable]
 public class BookNotFoundException : Exception
 {
     public BookNotFoundException() : base("Book not found") { }
@@ -53,12 +47,7 @@ public class NotLoggedInException : Exception
     public NotLoggedInException() : base("You need to Log in") { }
     public NotLoggedInException(string message) : base(message) { }
 };
-[Serializable]
-public class InvalidInputException : Exception
-{
-    public InvalidInputException() { }
-    public InvalidInputException(string message) : base(message) { }
-};
+
 [Serializable]
 public class BookBorrowedException : Exception
 {
@@ -87,27 +76,4 @@ public class LoginException : Exception
 {
     public LoginException() { }
     public LoginException(string message) : base(message) { }
-}
-
-
-[Serializable]
-public class InvalidEmailFormatException : Exception
-{
-    public InvalidEmailFormatException() : base("Invalid Email") { }
-    public InvalidEmailFormatException(string message) : base(message) { }
-
-}
-[Serializable]
-public class InvalidPasswordFormatException : Exception
-{
-    public InvalidPasswordFormatException() : base("Invalid Password") { }
-    public InvalidPasswordFormatException(string message) : base(message) { }
-
-}
-[Serializable]
-public class InvalidUsernameFormatException : Exception
-{
-    public InvalidUsernameFormatException() : base("Invalid Username") { }
-    public InvalidUsernameFormatException(string message) : base(message) { }
-
 }

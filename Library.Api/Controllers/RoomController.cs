@@ -42,7 +42,7 @@ namespace Library.Api.Controllers
 
         }
 
-        [HttpPost("RemoveRoomFromAccount")]
+        [HttpPost("RemoveRooFromAccount")]
         public async Task<IActionResult> RemoveRoomFromAccount(RoomUserDTO dto)
         {
             Room result = await _service.RemoveRoomFromAccount(dto.Room.id, dto.User.email);
@@ -52,10 +52,10 @@ namespace Library.Api.Controllers
             return BadRequest();
         }
 
-        [HttpDelete("DeleteRoom")]
-        public async Task<IActionResult> DeleteRoom(RoomDTO _Room)
+        [HttpDelete("{roomId}")]
+        public async Task<IActionResult> DeleteRoom([FromRoute] string roomId)
         {
-            Room result = await _service.RemoveRoomFromLibrary(_Room.id);
+            Room result = await _service.RemoveRoomFromLibrary(roomId);
             if (result is not null)
                 return Ok(result);
             return BadRequest();

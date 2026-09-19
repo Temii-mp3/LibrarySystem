@@ -15,7 +15,7 @@ namespace Library.Api.Controllers
             _service = service;
         }
 
-        [HttpPost("Create")]
+        [HttpPost("CreateAccount")]
         public async Task<IActionResult> CreateAccount(CreateAccountRequest request)
         {
             Account user = await _service.AddAccountToDB(request.Email, request.Password, request.Username);
@@ -28,10 +28,10 @@ namespace Library.Api.Controllers
             return BadRequest();
         }
 
-        [HttpGet("Lookup")]
-        public async Task<IActionResult> LookupAccount([FromQuery] LookupAccountRequest request)
+        [HttpGet("{email}")]
+        public async Task<IActionResult> LookupAccount([FromRoute] string email)
         {
-            Account user = await _service.LookupAccount(request.Email);
+            Account user = await _service.LookupAccount(email);
             if (user is not null)
             {
                 return Ok(user);
@@ -40,10 +40,10 @@ namespace Library.Api.Controllers
             return BadRequest();
         }
 
-        [HttpDelete("Delete")]
-        public async Task<IActionResult> DeleteAccount(DeleteAccountRequst request)
+        [HttpDelete("{email}")]
+        public async Task<IActionResult> DeleteAccount([FromRoute] string email)
         {
-            Account user = await _service.DeleteAccount(request.Email);
+            Account user = await _service.DeleteAccount(email);
             if (user is null)
                 return BadRequest();
             return Ok(user);
