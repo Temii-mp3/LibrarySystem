@@ -4,5 +4,6 @@
     {
         string? GetEmail();
         string? GetUserId();
+        bool IsAdmin();
     }
 }

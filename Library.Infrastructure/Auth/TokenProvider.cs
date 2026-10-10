@@ -16,22 +16,27 @@ namespace Library.Infrastructure.Auth
         public TokenProvider(IConfiguration config) => _config = config;
         public string Create(Account account)
         {
+            var claims = new List<Claim>
+            {
+                    new Claim(JwtRegisteredClaimNames.Sub, account.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Email, account.Email),
+            };
+            if (account.IsAdmin)
+                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
             string secrectKey = _config["Jwt:Secret"];
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secrectKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity([
-                    new Claim(JwtRegisteredClaimNames.Sub, account.Id.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, account.Email),
-                    new Claim("is_admin", account.IsAdmin.ToString())
-                    ]),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(_config.GetValue<int>("Jwt:ExpirationInMinuites")),
                 SigningCredentials = credentials,
                 Issuer = _config["Jwt:Issuer"],
                 Audience = _config["Jwt:Audience"]
             };
+
+
 
             var handler = new JsonWebTokenHandler();
 

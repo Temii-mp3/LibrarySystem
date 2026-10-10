@@ -34,12 +34,13 @@ namespace Library.Api.Controllers
 
 
         [Authorize]
-        [HttpGet("{email}")]
+        [HttpGet("{email}/lookup")]
         public async Task<IActionResult> LookupAccount([FromRoute] string email)
         {
             var userEmail = _currentUser.GetEmail();
 
-            if (string.IsNullOrEmpty(userEmail) || !string.Equals(userEmail, email, StringComparison.OrdinalIgnoreCase)){
+            if (string.IsNullOrEmpty(userEmail) || !string.Equals(userEmail, email, StringComparison.OrdinalIgnoreCase))
+            {
                 return Forbid();
             }
             Account user = await _service.LookupAccount(email);
@@ -50,11 +51,16 @@ namespace Library.Api.Controllers
 
             return BadRequest();
         }
-
-        [Authorize(Policy = "AdminOnly")]
-        [HttpDelete("{email}")]
+        [Authorize]
+        [HttpDelete("{email}/delete")]
         public async Task<IActionResult> DeleteAccount([FromRoute] string email)
         {
+            var userEmail = _currentUser.GetEmail();
+            var isAdmin = _currentUser.IsAdmin();
+
+            if (string.IsNullOrEmpty(userEmail) || !string.Equals(userEmail, email, StringComparison.OrdinalIgnoreCase) && !isAdmin)
+                return Forbid();
+
             Account user = await _service.DeleteAccount(email);
             if (user is null)
                 return BadRequest();

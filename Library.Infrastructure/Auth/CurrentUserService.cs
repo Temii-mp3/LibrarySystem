@@ -18,5 +18,7 @@ namespace Library.Infrastructure.Auth
 
         public string? GetUserId() =>
             _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        public bool IsAdmin() => Convert.ToBoolean(_httpContextAccessor.HttpContext?.User.FindFirst("is_admin")?.Value);
     }
 }
