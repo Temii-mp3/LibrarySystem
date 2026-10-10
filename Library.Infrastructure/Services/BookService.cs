@@ -1,4 +1,4 @@
-﻿using LibraryDomain.Models;
+﻿ using LibraryDomain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using System;
@@ -18,27 +18,37 @@ namespace Library.Infrastructure.Services
             book_repo = _book_repo;
             account_repo = _account_repo;
         }
-        public async Task<Book> ReturnBook(string isbn)
+        public async Task<Book> ReturnBook(string isbn, string userEmail)
         {
+            Account? user = await account_repo.LookupAccount(userEmail);
+            if (user is null)
+                throw new AccountNotFoundException();
+
             Book? book = await book_repo.GetBookfromDb(isbn);
             if (book is null)
                 throw new BookNotFoundException();
 
-            Book result = await book_repo.ReturnBook(book);
-            if (result is not null)
-                return book;
+            if(book.BorrowedBy == user.Id)
+            {
+                Book result = await book_repo.ReturnBook(book);
+                if (result is not null)
+                    return book;
+            }
+            else
+            {
+                throw new BookNotBorrowedByUserException();
+            }
+
             throw new GenericException();
         }
 
-        public async Task<ICollection<Book>> BooksInAccount(Account a)
+        public async Task<ICollection<Book>> BooksInAccount(string email)
         {
-            Account? user = await account_repo.LookupAccount(a);
+            Account? user = await account_repo.LookupAccount(email);
             if (user is null)
                 throw new AccountNotFoundException("Account not found");
 
             return user.Books;
-
-
         }
         public async Task<Book> AddBookToAccount(string isbn, string email)
         {

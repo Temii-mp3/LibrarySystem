@@ -1,6 +1,10 @@
-﻿using LibraryDomain.Models;
+﻿using Library.Infrastructure;
+using Library.Infrastructure.Auth;
+using LibraryDomain.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Data;
 using System.Text.RegularExpressions;
@@ -9,10 +13,14 @@ public class AccountService : IAccountService
 
     private readonly IAccountRepository _repo;
     private readonly IPasswordHasher<Account> _hasher;
-    public AccountService(IAccountRepository repo, IPasswordHasher<Account> hasher)
+    private readonly ITokenProvider _provider;
+    private readonly IConfiguration _config;
+    public AccountService(IAccountRepository repo, IPasswordHasher<Account> hasher, ITokenProvider provider, IConfiguration config)
     {
         _repo = repo;
         _hasher = hasher;
+        _provider = provider;
+        _config = config;
     }
     public async Task<Account> AddAccountToDB(string email, string password, string username)
     {
@@ -94,5 +102,33 @@ public class AccountService : IAccountService
         if (accounts is null)
             throw new GenericException();
         return accounts;
+    }
+
+    //public async Task<Account> UpdateAccount(int id, Account changes)
+    //{
+    //    return null;
+    //}
+
+    public async Task<string> LoginUser(string email, string password)
+    {
+        if (!CheckEmail(email) || !CheckPassword(password))
+            throw new LoginException();
+        Account? result = await _repo.LookupAccount(email);
+        if (result is null)
+            throw new AccountNotFoundException();
+        PasswordVerificationResult isValidPswd = _hasher.VerifyHashedPassword(result, result.Password, password);
+
+        if (isValidPswd == PasswordVerificationResult.Success)
+        {
+            var token = _provider.Create(result);
+            return token;
+        }
+        else if (isValidPswd == PasswordVerificationResult.SuccessRehashNeeded)
+        {
+            var token = _provider.Create(result);
+            return token; //TODO update this to rehash logik
+        }
+
+        throw new LoginException();
     }
 }

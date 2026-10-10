@@ -1,5 +1,8 @@
-﻿using LibraryDomain.Models;
+﻿using Library.Infrastructure.Auth;
+using LibraryDomain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Library.Api.Controllers
 {
@@ -8,11 +11,12 @@ namespace Library.Api.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _service;
+        private readonly ICurrentUserService _currentUser;
 
-
-        public AccountController(IAccountService service, IAccountRepository repo)
+        public AccountController(IAccountService service, ICurrentUserService currentUser)
         {
             _service = service;
+            _currentUser = currentUser;
         }
 
         [HttpPost("CreateAccount")]
@@ -28,9 +32,16 @@ namespace Library.Api.Controllers
             return BadRequest();
         }
 
+
+        [Authorize]
         [HttpGet("{email}")]
         public async Task<IActionResult> LookupAccount([FromRoute] string email)
         {
+            var userEmail = _currentUser.GetEmail();
+
+            if (string.IsNullOrEmpty(userEmail) || !string.Equals(userEmail, email, StringComparison.OrdinalIgnoreCase)){
+                return Forbid();
+            }
             Account user = await _service.LookupAccount(email);
             if (user is not null)
             {
@@ -40,6 +51,7 @@ namespace Library.Api.Controllers
             return BadRequest();
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{email}")]
         public async Task<IActionResult> DeleteAccount([FromRoute] string email)
         {
@@ -49,6 +61,7 @@ namespace Library.Api.Controllers
             return Ok(user);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet("GetAllAccounts")]
         public async Task<IActionResult> GetAllAccounts()
         {
@@ -57,6 +70,29 @@ namespace Library.Api.Controllers
                 return BadRequest();
             return Ok(accounts);
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginDTO dto)
+        {
+            string token = await _service.LoginUser(dto.email, dto.password);
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest();
+            }
+
+            return Ok(token);
+        }
+        //[HttpPost("UpdateAccount")]
+        //public async Task<IActionResult> UpdateAccount(UpdateAccountRequest request)
+        //{
+        //    Account updatedAccount = new Account
+        //    {
+        //        Email = string.IsNullOrEmpty(request.Email) ? request.Email : null,
+        //        Password = string.IsNullOrEmpty(request.Password) ? request.Password : null,
+        //        Username = string.IsNullOrEmpty(request.Username) ? request.Username : null
+        //    };
+        //}
 
     }
 }

@@ -9,4 +9,7 @@ public interface IAccountService
     public Task<Account> AddAccountToDB(string email, string password, string username);
 
     public Task<ICollection<Account>> GetAllAccounts();
+    //public Task<Account> UpdateAccount(int id, Account changes);
+    public Task<string> LoginUser(string email, string password);
+
 }

@@ -1,8 +1,11 @@
 ﻿using Library.Infrastructure.Services;
 using LibraryDomain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Microsoft.CodeAnalysis.Operations;
 using System.Data;
+using Library.Infrastructure.Auth;
 
 namespace Library.Api.Controllers
 {
@@ -11,13 +14,17 @@ namespace Library.Api.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBookService _service;
+        private readonly ICurrentUserService _currentUser;
 
 
-        public BookController(IBookService service)
+        public BookController(IBookService service, ICurrentUserService currentUser)
         {
             _service = service;
+            _currentUser = currentUser;
         }
 
+
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost("AddBookToLibrary")]
         public async Task<IActionResult> AddBookToLbrary(CreateBookRequest request)
         {
@@ -29,39 +36,49 @@ namespace Library.Api.Controllers
             return Ok(book);
         }
 
-        [HttpPost("AddBookToAccount")]
-        public async Task<IActionResult> BorrowBook(BorrowBookRequest req)
+        [Authorize]
+        [HttpPost("{isbn}/borrow")]
+        public async Task<IActionResult> BorrowBook([FromRoute] string isbn)
         {
-            Book result = await _service.AddBookToAccount(req.isbn, req.email);
+            var userEmail = _currentUser.GetEmail();
+
+            if (string.IsNullOrEmpty(userEmail))
+                return Forbid();
+
+            Book result = await _service.AddBookToAccount(isbn, userEmail);
             if (result is not null)
             {
                 var bookdto = new BookReturnDTO(result.Isbn, result.Name, result.Author);
                 return Ok(bookdto);
             }
             return BadRequest();
-            
         }
 
-        [HttpPost("RemoveFromAccount/{isbn}")]
-        public async Task<IActionResult> RemoveBookFromAccount([FromRoute]string isbn)
+        [Authorize]
+        [HttpPost("{isbn}/return")]
+        public async Task<IActionResult> RemoveBookFromAccount([FromRoute] string isbn)
         {
-
-            Book result = await _service.ReturnBook(isbn);
+            var userEmail = _currentUser.GetEmail();
+            if (string.IsNullOrEmpty(userEmail))
+                return Forbid();
+            Book result = await _service.ReturnBook(isbn, userEmail);
             if (result is not null)
                 return Ok(result);
 
             return BadRequest();
         }
 
-        [HttpDelete("DeleteBook")]
-        public async Task<IActionResult> DeleteBook(BookDTO _book)
+        [Authorize(Policy = "AdminOnly")]
+        [HttpDelete("{isbn}/delete")]
+        public async Task<IActionResult> DeleteBook([FromRoute] string isbn)
         {
-            Book result = await _service.DeleteBook(_book.Isbn);
+            Book result = await _service.DeleteBook(isbn);
             if (result is not null)
                 return Ok(result);
             return BadRequest();
         }
 
+        [Authorize]
         [HttpGet("GetAllBooks")]
         public async Task<IActionResult> GetAllBooks()
         {
@@ -72,7 +89,22 @@ namespace Library.Api.Controllers
             return Ok(books);
         }
 
-    } 
+        [Authorize]
+        [HttpGet("{email}/books")]
+        public async Task<IActionResult> GetBooksInAccount()
+        {
+            var userEmail = _currentUser.GetEmail();
+            if (string.IsNullOrEmpty(userEmail)) return Forbid();
+            ICollection<Book> books = await _service.BooksInAccount(userEmail);
+
+            if (books is null)
+                return BadRequest();
+            return Ok(books);
+        }
+
+
+
+    }
 }
 
 

@@ -1,19 +1,13 @@
 ﻿public record CreateAccountRequest(string Email, string Password, string Username);
+public record UpdateAccountRequest(string? Email, string? Password, string? Username);
+public record LoginDTO(string? email, string? password);
 public record DeleteAccountRequst(string Email);
 public record LookupAccountRequest(string Email);
-
 public record CreateBookRequest(string Isbn, string Author, string Name);
-
 public record BorrowBookRequest(string isbn, string email);
 public record BookDTO(string Isbn);
-
-
-
 public record BookReturnDTO(string? isbn, string? name, string? author);
-
 public record CreateRoomRequest(string type);
-
-
 public record AccountDTO(string email);
 public record RoomDTO(string id);
 public record RoomUserDTO(RoomDTO Room, AccountDTO User);

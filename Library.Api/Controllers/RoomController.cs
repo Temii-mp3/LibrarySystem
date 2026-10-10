@@ -1,9 +1,12 @@
-﻿using Library.Infrastructure.Services;
+﻿using Library.Infrastructure.Auth;
+using Library.Infrastructure.Services;
 using LibraryDomain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Operations;
 using System.ComponentModel.Design;
 using System.Data;
+using System.Security.Claims;
 
 namespace Library.Api.Controllers
 {
@@ -12,13 +15,16 @@ namespace Library.Api.Controllers
     public class RoomController : ControllerBase
     {
         private readonly IRoomService _service;
+        private readonly ICurrentUserService _currentUser;
 
 
-        public RoomController(IRoomService service)
+        public RoomController(IRoomService service, ICurrentUserService currentUser)
         {
+            _currentUser = currentUser;
             _service = service;
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost("AddRoomToLibrary")]
         public async Task<IActionResult> AddRoomToLbrary(CreateRoomRequest request)
         {
@@ -30,10 +36,15 @@ namespace Library.Api.Controllers
             return Ok(room);
         }
 
-        [HttpPost("AddRoomToAccount")]
-        public async Task<IActionResult> AddRoomToAccount(RoomUserDTO dto)
+        [Authorize]
+        [HttpPost("{id}/checkout")]
+        public async Task<IActionResult> AddRoomToAccount([FromRoute] string id)
         {
-            Room result = await _service.AddRoomToAccount(dto.Room.id, dto.User.email);
+            var userEmail = _currentUser.GetEmail();
+            if (string.IsNullOrEmpty(userEmail))
+                return Forbid();
+
+            Room result = await _service.AddRoomToAccount(id, userEmail);
             if (result is not null)
             {
                 return Ok(result);
@@ -42,17 +53,23 @@ namespace Library.Api.Controllers
 
         }
 
-        [HttpPost("RemoveRooFromAccount")]
-        public async Task<IActionResult> RemoveRoomFromAccount(RoomUserDTO dto)
+        [Authorize]
+        [HttpPost("{id}/checkin")]
+        public async Task<IActionResult> RemoveRoomFromAccount([FromRoute] string id)
         {
-            Room result = await _service.RemoveRoomFromAccount(dto.Room.id, dto.User.email);
+            var userEmail = _currentUser.GetEmail();
+            if (string.IsNullOrEmpty(userEmail))
+                return Forbid();
+
+            Room result = await _service.RemoveRoomFromAccount(id, userEmail);
             if (result is not null)
                 return Ok(result);
 
             return BadRequest();
         }
 
-        [HttpDelete("{roomId}")]
+        [Authorize(Policy = "AdminOnly")]
+        [HttpDelete("{roomId}/delete")]
         public async Task<IActionResult> DeleteRoom([FromRoute] string roomId)
         {
             Room result = await _service.RemoveRoomFromLibrary(roomId);
@@ -71,10 +88,14 @@ namespace Library.Api.Controllers
             return Ok(Rooms);
         }
 
-        [HttpGet("GetBookedRoomsInAccount")]
-        public async Task<IActionResult> GetBookedRoomsInAccount([FromQuery]AccountDTO user)
+        [Authorize]
+        [HttpGet("{email}/rooms")]
+        public async Task<IActionResult> GetBookedRoomsInAccount()
         {
-            ICollection<Room> Rooms = await _service.GetBorrowedRooms(user.email);
+            var userEmail = _currentUser.GetEmail();
+            if (string.IsNullOrEmpty(userEmail))
+                return Forbid();
+            ICollection<Room> Rooms = await _service.GetBorrowedRooms(userEmail);
 
             if (Rooms is null)
                 return BadRequest();

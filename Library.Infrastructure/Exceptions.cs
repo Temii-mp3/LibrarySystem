@@ -77,3 +77,11 @@ public class LoginException : Exception
     public LoginException() { }
     public LoginException(string message) : base(message) { }
 }
+
+
+[Serializable]
+public class BookNotBorrowedByUserException : Exception
+{
+    public BookNotBorrowedByUserException() : base("Book is not borrowed by current user") { }
+    public BookNotBorrowedByUserException(string message) : base(message) { }
+};

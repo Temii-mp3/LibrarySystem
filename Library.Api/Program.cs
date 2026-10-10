@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
+using System.Text.Json.Serialization;
+using Library.Infrastructure.Auth;
+using Library.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,11 +44,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireClaim("is_admin", "true"));
+});
 
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ExceptionFilter>();
+}).AddJsonOptions(options =>{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -83,6 +91,7 @@ builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher<Account>>();
 builder.Services.AddDbContext<LibraryDomain.Models.LibraryContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("LibraryDb") ?? "Data Source=Library.db"));
 
+builder.Services.AddInfraServices();
 var app = builder.Build();
 
 app.UseCors("UIPolicy");
