@@ -1,4 +1,4 @@
-﻿using LibraryDomain.Models;
+﻿using Library.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

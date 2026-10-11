@@ -1,4 +1,4 @@
-﻿using LibraryDomain.Models;
+﻿using Library.Domain.Models;
 using System;
 
 public interface IRoomService

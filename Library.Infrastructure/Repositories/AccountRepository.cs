@@ -1,4 +1,4 @@
-﻿using LibraryDomain.Models;
+﻿using Library.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
@@ -65,12 +65,12 @@ public class AccountRepositry : IAccountRepository
     }
 
 
-    public async Task<Account> UpdateAccount(Account a)
+    public async Task<Account> UpdateAccount(Account user, Account changes)
     {
-        Account? account = await _context.Accounts.FirstOrDefaultAsync(f => f.Id == a.Id);
-        account = a;
+        _context.Entry(user).CurrentValues.SetValues(changes);
+
         if (await _context.SaveChangesAsync() >= 1)
-            return a;
+            return user;
         throw new GenericException("Cannot Update Account");
     }
 
