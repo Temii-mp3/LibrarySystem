@@ -1,13 +1,16 @@
 ﻿using Library.Infrastructure;
 using Library.Infrastructure.Auth;
-using LibraryDomain.Models;
+using Library.Domain.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Data;
 using System.Text.RegularExpressions;
+
+
 public class AccountService : IAccountService
 {
 
@@ -104,10 +107,39 @@ public class AccountService : IAccountService
         return accounts;
     }
 
-    //public async Task<Account> UpdateAccount(int id, Account changes)
-    //{
-    //    return null;
-    //}
+    public async Task<Account> UpdateAccount(string email, Account changes)
+    {
+        var userAccount = await _repo.LookupAccount(email);
+
+        if (userAccount is null)
+            throw new AccountNotFoundException();
+
+        changes.Email = string.IsNullOrEmpty(changes.Email) ? userAccount.Email : changes.Email;
+        changes.Password = string.IsNullOrEmpty(changes.Password) ? userAccount.Password : changes.Password;
+        changes.Username = string.IsNullOrEmpty(changes.Username) ? userAccount.Username : changes.Username;
+
+        if (!CheckEmail(changes.Email) || !CheckUser(changes.Username))
+        {
+            throw new LoginException();
+        }
+        else if (changes.Password != userAccount.Password && !CheckPassword(changes.Password))
+        {
+            throw new LoginException();
+        }
+
+        if (changes.Password != userAccount.Password && CheckPassword(changes.Password))
+            changes.Password = _hasher.HashPassword(userAccount, changes.Password!);
+
+        changes.Id = userAccount.Id;
+        changes.Books = userAccount.Books;
+        changes.Rooms = userAccount.Rooms;
+        changes.IsAdmin = userAccount.IsAdmin;
+
+        var result = await _repo.UpdateAccount(userAccount, changes);
+        if (result is null)
+            throw new GenericException("Account update Failed");
+        return result;
+    }
 
     public async Task<string> LoginUser(string email, string password)
     {

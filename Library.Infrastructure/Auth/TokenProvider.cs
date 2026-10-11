@@ -1,4 +1,4 @@
-﻿using LibraryDomain.Models;
+﻿using Library.Domain.Models;
 using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

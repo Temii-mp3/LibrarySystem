@@ -1,10 +1,11 @@
 ﻿using Library.Infrastructure.Services;
-using LibraryDomain.Models;
+using Library.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.CodeAnalysis.Operations;
 using System.Data;
+using Library.Api.DTO;
 using Library.Infrastructure.Auth;
 
 namespace Library.Api.Controllers

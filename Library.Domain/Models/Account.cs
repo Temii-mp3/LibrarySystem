@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LibraryDomain.Models;
+namespace Library.Domain.Models;
 
 public partial class Account
 {

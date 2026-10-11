@@ -1,5 +1,6 @@
 ﻿using Library.Infrastructure.Auth;
-using LibraryDomain.Models;
+using Library.Domain.Models;
+using Library.Api.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -89,16 +90,30 @@ namespace Library.Api.Controllers
 
             return Ok(token);
         }
-        //[HttpPost("UpdateAccount")]
-        //public async Task<IActionResult> UpdateAccount(UpdateAccountRequest request)
-        //{
-        //    Account updatedAccount = new Account
-        //    {
-        //        Email = string.IsNullOrEmpty(request.Email) ? request.Email : null,
-        //        Password = string.IsNullOrEmpty(request.Password) ? request.Password : null,
-        //        Username = string.IsNullOrEmpty(request.Username) ? request.Username : null
-        //    };
-        //}
+
+
+
+        [HttpPost("UpdateAccount")]
+        public async Task<IActionResult> UpdateAccount(UpdateAccountRequest request)
+        {
+            var userEmail = _currentUser.GetEmail();
+
+            if (string.IsNullOrEmpty(userEmail))
+                return Forbid();
+            Account updatedAccount = new Account
+            {
+                Email = string.IsNullOrWhiteSpace(request.Email) ? null : request.Email,
+                Password = string.IsNullOrWhiteSpace(request.Password) ? null : request.Password,
+                Username = string.IsNullOrWhiteSpace(request.Username) ? null : request.Username
+            };
+
+            var result = await _service.UpdateAccount(userEmail, updatedAccount);
+
+            if (result is null)
+                return BadRequest();
+
+            return Ok(result);
+        }
 
     }
 }
