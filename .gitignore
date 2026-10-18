@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+Library.Api/appsettings.json
+Library.Api/Library.db
+Library.Api/Library.db-shm
+Library.Api/Library.db-wal
+LibrarySystem/Library.db

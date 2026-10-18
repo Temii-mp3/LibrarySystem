@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibrarySystem.Models;
+namespace Library.Domain.Models;
 
 public partial class LibraryContext : DbContext
 {
@@ -57,7 +57,7 @@ public partial class LibraryContext : DbContext
         {
             entity.ToTable("Room");
 
-            entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.Id).HasColumnName("ID").ValueGeneratedOnAdd();
             entity.Property(e => e.Bookedby).HasColumnName("BOOKEDBY");
             entity.Property(e => e.Type).HasColumnName("TYPE");
 
