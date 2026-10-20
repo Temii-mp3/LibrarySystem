@@ -15,6 +15,4 @@ public partial class Account
     public bool IsAdmin { get; set;  } = false;
 
     public virtual ICollection<Book> Books { get; set; } = new List<Book>();
-
-    public virtual ICollection<Room> Rooms { get; set; } = new List<Room>();
 }

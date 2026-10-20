@@ -94,6 +94,12 @@ builder.Services.AddDbContext<Library.Domain.Models.LibraryContext>(options =>
 builder.Services.AddInfraServices();
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<LibraryContext>();
+    db.Database.Migrate();
+}
+
 app.UseCors("UIPolicy");
 app.UseHttpsRedirection();
 app.UseAuthentication();

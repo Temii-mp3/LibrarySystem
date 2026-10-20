@@ -5,15 +5,13 @@ namespace Library.Domain.Models;
 
 public partial class Book
 {
-    public string Isbn { get; set; } = null!;
+    public int Id { get; set; }
+    public string? Isbn { get; set; }
 
     public string? Author { get; set; }
 
     public string? Name { get; set; }
-
-    public int? BorrowedBy { get; set; }
-
-    public virtual Account? BorrowedByNavigation { get; set; }
+    public ICollection<BookFile> BookFiles { get; set; } = new List<BookFile>();
 
 
     public override string ToString()

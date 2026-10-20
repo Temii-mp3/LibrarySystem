@@ -25,20 +25,11 @@ namespace Library.Infrastructure.Repositories
             throw new GenericException();
         }
 
-        public async Task<List<Book>> BooksInAccount(Account a)
+        public async Task<List<Book>> GetDownloadedBooks(Account a)
         {
             List<Book> books = a.Books.ToList();
 
             return books;
-        }
-
-        public async Task<Book> ReturnBook(Book b)
-        {
-            b.BorrowedBy = null;
-
-            if (await _context.SaveChangesAsync() >= 1)
-                return b;
-            throw new GenericException();
         }
         public void PrintBooks()
         {
@@ -61,7 +52,7 @@ namespace Library.Infrastructure.Repositories
             throw new GenericException();
         }
 
-        public void PrintBorrowedBooks(Account user)
+        public void PrintDownloadedBooks(Account user)
         {
             foreach (var item in user.Books)
             {

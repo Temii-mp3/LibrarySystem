@@ -19,7 +19,7 @@ public partial class LibraryContext : DbContext
 
     public virtual DbSet<Book> Books { get; set; }
 
-    public virtual DbSet<Room> Rooms { get; set; }
+    public virtual DbSet<BookFile> BookFiles { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -44,24 +44,29 @@ public partial class LibraryContext : DbContext
 
         modelBuilder.Entity<Book>(entity =>
         {
-            entity.HasKey(e => e.Isbn);
 
             entity.ToTable("Book");
 
-            entity.Property(e => e.Isbn).HasColumnName("ISBN");
-
-            entity.HasOne(d => d.BorrowedByNavigation).WithMany(p => p.Books).HasForeignKey(d => d.BorrowedBy);
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Isbn, "IX_Book_Isbn").IsUnique();
+            entity.Property(e => e.Id).HasColumnName("ID").ValueGeneratedOnAdd().UseAutoincrement();
         });
 
-        modelBuilder.Entity<Room>(entity =>
+        modelBuilder.Entity<BookFile>(entity =>
         {
-            entity.ToTable("Room");
+            entity.ToTable("BookFile");
 
-            entity.Property(e => e.Id).HasColumnName("ID").ValueGeneratedOnAdd();
-            entity.Property(e => e.Bookedby).HasColumnName("BOOKEDBY");
-            entity.Property(e => e.Type).HasColumnName("TYPE");
+            entity.Property(e => e.Id).HasColumnName("ID").ValueGeneratedOnAdd().UseAutoincrement();
 
-            entity.HasOne(d => d.BookedbyNavigation).WithMany(p => p.Rooms).HasForeignKey(d => d.Bookedby);
+            entity.HasOne(f => f.Book)
+                .WithMany(b => b.BookFiles)
+                .HasForeignKey(f => f.BookId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(f => new { f.BookId, f.Format }, "IX_BookFile_BookId_Format").IsUnique();
+            entity.HasIndex(f => f.StorageKey, "IX_BookFile_StorageKey").IsUnique();
+
+            entity.Property(f => f.Format).HasConversion<string>();
         });
 
         OnModelCreatingPartial(modelBuilder);
